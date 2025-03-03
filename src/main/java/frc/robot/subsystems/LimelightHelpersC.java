@@ -5,7 +5,7 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class LimelightHelpers extends SubsystemBase{
+public class LimelightHelpersC extends SubsystemBase{
     double x = 0;
     double y = 0;
     double a = 0;
@@ -13,7 +13,7 @@ public class LimelightHelpers extends SubsystemBase{
 
     double[] botpose = new double[6];
 
-    public LimelightHelpers(){}
+    public LimelightHelpersC(){}
 
     public double[] update(){
         NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
@@ -21,7 +21,7 @@ public class LimelightHelpers extends SubsystemBase{
         NetworkTableEntry ty = table.getEntry("ty");
         NetworkTableEntry ta = table.getEntry("ta");
         NetworkTableEntry tl = table.getEntry("tl");
-        NetworkTableEntry pose = table.getEntry("botpose");
+        NetworkTableEntry pose = table.getEntry("botpose_orb_wpiblue");
 
         x = tx.getDouble(0.0);
         y = ty.getDouble(0.0);
@@ -31,5 +31,6 @@ public class LimelightHelpers extends SubsystemBase{
         botpose = pose.getDoubleArray(botpose);
         
         return botpose;
+
     }
 }

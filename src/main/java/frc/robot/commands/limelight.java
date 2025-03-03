@@ -14,18 +14,21 @@ import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.LimelightHelpers;
+import frc.robot.subsystems.LimelightHelpersC;
+import frc.robot.util.LimelightHelpers;
+import frc.robot.util.LimelightHelpers.PoseEstimate;
 
  
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class limelight extends Command {
   /** Creates a new limelight. */
-  private final LimelightHelpers m_limelight_subsystem;
+  private final LimelightHelpersC m_limelight_subsystem;
   private final DriveSubsystem m_drive_subsystem;
   private DoubleLogEntry m_DoubleLog;
   private DataLog log;
@@ -33,10 +36,10 @@ public class limelight extends Command {
   //private SwerveDrivePoseEstimator m_swerve_drive_pose_estimator;
   private Timer timer;
 
-  private double[] botpose;
+  private PoseEstimate botpose;
   private double time;
 
-  public limelight(LimelightHelpers limelight_subsystem, DriveSubsystem drive_subsystem) {
+  public limelight(LimelightHelpersC limelight_subsystem, DriveSubsystem drive_subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_limelight_subsystem = limelight_subsystem;
     this.m_drive_subsystem = drive_subsystem;
@@ -55,24 +58,28 @@ public class limelight extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    botpose = m_limelight_subsystem.update();
+    LimelightHelpers.SetRobotOrientation("limelight", m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    botpose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
 
     log = DataLogManager.getLog();
     m_DoubleLog = new DoubleLogEntry(log, "/my/double");
 
-    if (botpose != null){
-      SmartDashboard.putNumber("Pose1: ", botpose[0]);
-      SmartDashboard.putNumber("Pose2: ", botpose[1]);
-      SmartDashboard.putNumber("Pose3: ", botpose[2]);
-      SmartDashboard.putNumber("Pose4: ", botpose[3]);
-      SmartDashboard.putNumber("Pose5: ", botpose[4]);
-      SmartDashboard.putNumber("Pose6: ", botpose[5]);
-      m_DoubleLog.append(botpose[2]);
+    SmartDashboard.putNumber("rotation: ", this.m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition().getRotation().getDegrees());
+    SmartDashboard.putNumber("rotation2: ", this.m_drive_subsystem.m_gyro.getAngle());
 
-      pose = new Pose2d(botpose[0], botpose[2], new Rotation2d(botpose[4]));
 
-      m_drive_subsystem.updateSwerveDrive(m_drive_subsystem.getHeading(), m_drive_subsystem.getSwerveModulePositions());
-      m_drive_subsystem.updateVisionSwerveDrive(pose, timer.getFPGATimestamp() - time);
+    if (botpose.tagCount > 0){
+      SmartDashboard.putNumber("Pose1: ", botpose.pose.getX());
+      SmartDashboard.putNumber("Pose2: ", botpose.pose.getY());
+      SmartDashboard.putNumber("Pose3: ", botpose.pose.getRotation().getDegrees());
+            // SmartDashboard.putNumber("Pose4: ", botpose[3]);
+      // SmartDashboard.putNumber("Pose5: ", botpose[4]);
+      // SmartDashboard.putNumber("Pose6: ", botpose[5]);
+      // m_DoubleLog.append(botpose[2]);
+
+      // pose = new Pose2d(botpose[0], botpose[1], m_drive_subsystem.getHeading());
+
+      //this.m_drive_subsystem.updateVisionSwerveDrive(botpose.pose, botpose.timestampSeconds);
 
       this.m_drive_subsystem.resetOdometry(m_drive_subsystem.getPoseEstimate());
     }

@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -45,7 +45,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kBackRightChassisAngularOffset);
 
   // The gyro sensor
-  private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+  public final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
 
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -58,7 +58,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
       });
 
-  SwerveDrivePoseEstimator m_swerve_drive_pose_estimator = new SwerveDrivePoseEstimator(
+  public SwerveDrivePoseEstimator m_swerve_drive_pose_estimator = new SwerveDrivePoseEstimator(
     DriveConstants.kDriveKinematics, 
     Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)), 
     new SwerveModulePosition[] {
@@ -67,6 +67,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.getPosition(),
     m_rearRight.getPosition()}, 
     new Pose2d());
+
+  public Field2d m_field = new Field2d();
 
 
   /** Creates a new DriveSubsystem. */
@@ -78,6 +80,8 @@ public class DriveSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // Update the odometry in the periodic block
+    m_field.setRobotPose(getPose());
+    SmartDashboard.putData("Field", m_field);
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
         new SwerveModulePosition[] {
@@ -86,6 +90,8 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+
+    updateSwerveDrive(Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)), getSwerveModulePositions());
   }
 
   /**
