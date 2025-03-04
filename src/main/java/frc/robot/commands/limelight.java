@@ -58,7 +58,8 @@ public class limelight extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    LimelightHelpers.SetRobotOrientation("limelight", m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition().getRotation().getDegrees(), 0, 0, 0, 0, 0);
+    //LimelightHelpers.SetRobotOrientation("limelight", m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition().getRotation().getDegrees() + 180, m_drive_subsystem.m_gyro.getRate(), 0, 0, 0, 0);
+    LimelightHelpers.SetRobotOrientation("limelight", m_drive_subsystem.m_gyro.getAngle(), m_drive_subsystem.m_gyro.getRate(), 0, 0, 0, 0);
     botpose = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight");
 
     log = DataLogManager.getLog();
@@ -67,21 +68,22 @@ public class limelight extends Command {
     SmartDashboard.putNumber("rotation: ", this.m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition().getRotation().getDegrees());
     SmartDashboard.putNumber("rotation2: ", this.m_drive_subsystem.m_gyro.getAngle());
 
+    if (botpose != null){
+      if (botpose.tagCount > 0){
+        SmartDashboard.putNumber("Pose1: ", botpose.pose.getX());
+        SmartDashboard.putNumber("Pose2: ", botpose.pose.getY());
+        SmartDashboard.putNumber("Pose3: ", botpose.pose.getRotation().getDegrees());
+              // SmartDashboard.putNumber("Pose4: ", botpose[3]);
+        // SmartDashboard.putNumber("Pose5: ", botpose[4]);
+        // SmartDashboard.putNumber("Pose6: ", botpose[5]);
+        // m_DoubleLog.append(botpose[2]);
 
-    if (botpose.tagCount > 0){
-      SmartDashboard.putNumber("Pose1: ", botpose.pose.getX());
-      SmartDashboard.putNumber("Pose2: ", botpose.pose.getY());
-      SmartDashboard.putNumber("Pose3: ", botpose.pose.getRotation().getDegrees());
-            // SmartDashboard.putNumber("Pose4: ", botpose[3]);
-      // SmartDashboard.putNumber("Pose5: ", botpose[4]);
-      // SmartDashboard.putNumber("Pose6: ", botpose[5]);
-      // m_DoubleLog.append(botpose[2]);
+        // pose = new Pose2d(botpose[0], botpose[1], m_drive_subsystem.getHeading());
 
-      // pose = new Pose2d(botpose[0], botpose[1], m_drive_subsystem.getHeading());
+        this.m_drive_subsystem.updateVisionSwerveDrive(botpose.pose, botpose.timestampSeconds);
 
-      //this.m_drive_subsystem.updateVisionSwerveDrive(botpose.pose, botpose.timestampSeconds);
-
-      this.m_drive_subsystem.resetOdometry(m_drive_subsystem.getPoseEstimate());
+        this.m_drive_subsystem.resetOdometry(m_drive_subsystem.getPoseEstimate());
+      }
     }
   }
 
