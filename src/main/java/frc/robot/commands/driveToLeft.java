@@ -20,15 +20,19 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.util.LimelightHelpers;
 
+import frc.robot.Constants.DriveConstants;
+
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class driveToLeft extends Command {
+public class driveToLeft extends InstantCommand {
   /** Creates a new driveToLeft. */
   private DriveSubsystem m_drive_subsystem;
   private LimelightHelpers m_limelight_subsystem;
@@ -37,6 +41,8 @@ public class driveToLeft extends Command {
   
   
   private double id_dub;
+  private Pose2d pose_final;
+  private Pose2d pose_initial;
   
   //AprilTagFieldLayout map = new AprilTagFieldLayout((Path) AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark));
   //private Path file_path = FileSystem.getDeployDirectory().toPath().resolve(path_to_map);
@@ -54,6 +60,11 @@ public class driveToLeft extends Command {
     id_dub = LimelightHelpers.getFiducialID("limelight");
     int id = (int) id_dub;
     Pose2d position_of_apriltag = map.getTagPose(id).get().toPose2d();
+    pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
+    pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1)).transformBy(new Transform2d(DriveConstants.kWheelBase/2, -0.127, new Rotation2d(0))).rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(-3.14159)).times(-1);
+
+    //m_drive_subsystem.resetOdometry(pose_initial);
+
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
@@ -61,13 +72,13 @@ public class driveToLeft extends Command {
     //config.setReversed(true);
 
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition(),
-        List.of(new Translation2d(0, 0)),
-        position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1)).transformBy(new Transform2d(0, -1, new Rotation2d())).rotateBy(position_of_apriltag.getRotation()),
+        pose_initial,
+        List.of(),
+        pose_final,
         config);
 
     var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+        AutoConstants.kPThetaController, 0, AutoConstants.kIThetaController, AutoConstants.kThetaControllerConstraints);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
     swerveControllerCommand = new SwerveControllerCommand(
@@ -75,24 +86,31 @@ public class driveToLeft extends Command {
         m_drive_subsystem::getPose,
         DriveConstants.kDriveKinematics,
 
-        new PIDController(AutoConstants.kPXController, 0, 0),
-        new PIDController(AutoConstants.kPYController, 0, 0),
+        new PIDController(AutoConstants.kPXController, 0, AutoConstants.kIXController),
+        new PIDController(AutoConstants.kPYController, 0, AutoConstants.kIYController),
         thetaController,
         m_drive_subsystem::setModuleStates,
         m_drive_subsystem);
 
-        m_drive_subsystem.resetOdometry(exampleTrajectory.getInitialPose());
-  }
+    swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false)).schedule();
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false));
+    SmartDashboard.putNumber("X1: ", pose_initial.getX());
+    SmartDashboard.putNumber("Y1: ", pose_initial.getY());
+
+    SmartDashboard.putNumber("X2: ", pose_final.getX());
+    SmartDashboard.putNumber("Y2: ", pose_final.getY());
+
+    SmartDashboard.putNumber("R: ", pose_initial.getRotation().getDegrees());
+    SmartDashboard.putNumber("R2: ", pose_final.getRotation().getDegrees());
+    
+    m_drive_subsystem.resetOdometry(exampleTrajectory.getInitialPose());
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    swerveControllerCommand.end(interrupted);
+  }
 
   // Returns true when the command should end.
   @Override

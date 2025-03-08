@@ -81,6 +81,7 @@ public class DriveSubsystem extends SubsystemBase {
   public void periodic() {
     // Update the odometry in the periodic block
     m_field.setRobotPose(getPose());
+    m_field.setRobotPose(m_swerve_drive_pose_estimator.getEstimatedPosition());
     SmartDashboard.putData("Field", m_field);
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)),
@@ -189,6 +190,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.reset();
+    //m_gyro.setGyroAngleZ(180);
   }
 
   /**

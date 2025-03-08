@@ -7,6 +7,7 @@
     },
     "types": {
       "/FMSInfo": "FMSInfo",
+      "/SmartDashboard/Auto choices": "String Chooser",
       "/SmartDashboard/Field": "Field2d"
     },
     "windows": {

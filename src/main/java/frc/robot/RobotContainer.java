@@ -101,8 +101,12 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    new JoystickButton(m_driverController, Button.kCircle.value).whileTrue(
+    new JoystickButton(m_driverController, Button.kCircle.value).toggleOnTrue(
       new driveToLeft(m_robotDrive, m_limelight_subsystem)
+    );
+
+    new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
+      new RunCommand(() -> m_robotDrive.zeroHeading())
     );
   }
 
