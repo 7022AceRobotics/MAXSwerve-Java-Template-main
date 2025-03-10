@@ -4,24 +4,27 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.Constants;
+import frc.robot.subsystems.AlgeacollectorSubsystem;
+import frc.robot.subsystems.AlgeacollectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /** An example command that uses an example subsystem. */
-public class ExampleCommand extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final ElevatorSubsystem m_subsystem;
+public class AlgeaShoot extends Command {
+
+  AlgeacollectorSubsystem AlgeacollectorSubsystem;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public ExampleCommand(ElevatorSubsystem subsystem) {
-    m_subsystem = subsystem;
+  public AlgeaShoot(AlgeacollectorSubsystem AlgeacollectorSubsystem) {
+    AlgeacollectorSubsystem = AlgeacollectorSubsystem;
+
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+    addRequirements(AlgeacollectorSubsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -30,11 +33,16 @@ public class ExampleCommand extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    AlgeacollectorSubsystem.PullSetSpeed(-50);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    AlgeacollectorSubsystem.PullSetSpeed(0);
+
+  }
 
   // Returns true when the command should end.
   @Override

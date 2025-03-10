@@ -112,15 +112,37 @@ public final class Constants {
   }
   public static final class ElevatorConstants {
     public static final int ElevatorMotorPort = 12;
-    public static double kP = 0;
-    public static double kI = 0;
-    public static double kD = 0;
-    public static double kIz = 0;
-    public static double kFF = 0;
-    public static double kMaxOutput = 0;
-    public static double kMinOutput = 0;
-    public static double maxVel = 0;
-    public static double maxAccel = 0;
-    public static double allowedErr = 0;
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kIz = 0;
+    public static final double kFF = 0;
+    public static final double kMaxOutput = 0;
+    public static final double kMinOutput = 0;
+    public static final double maxVel = 0;
+    public static final double maxAccel = 0;
+    public static final double allowedErr = 0;
+    //Elevator Positions has to be positive
+    public static final double Stage1Posistion = 0;
+    public static final double Stage2Posistion = 0;
+    public static final double Stage3Posistion = 0;
+    public static final double Stage4Posistion = 0;
+  }
+  public static final class AlgeaConstants {
+    public static final int AlgeaPivotMotorPort = 11;
+    public static final int AlgeaPullMotorPort = 10;
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kIz = 0;
+    public static final double kFF = 0;
+    public static final double kMaxOutput = 0;
+    public static final double kMinOutput = 0;
+    public static final double maxVel = 0;
+    public static final double maxAccel = 0;
+    public static final double allowedErr = 0;
+    //Elevator Positions has to be positive
+    public static final double OutPosistion = 0;
+    public static final double InPosistion = 0;
   }
 }
