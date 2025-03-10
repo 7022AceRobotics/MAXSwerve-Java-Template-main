@@ -25,8 +25,8 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds. 4.5 is max
-    public static final double kMaxSpeedMetersPerSecond = 4.5;
-    public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
+    public static final double kMaxSpeedMetersPerSecond = 0.5;
+    public static final double kMaxAngularSpeed = Math.PI; // radians per second
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(20);
@@ -52,13 +52,13 @@ public final class Constants {
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 1;
-    public static final int kRearLeftDrivingCanId = 3;
-    public static final int kFrontRightDrivingCanId = 2;
+    public static final int kRearLeftDrivingCanId = 2;
+    public static final int kFrontRightDrivingCanId = 3;
     public static final int kRearRightDrivingCanId = 4;
 
     public static final int kFrontLeftTurningCanId = 5;
-    public static final int kRearLeftTurningCanId = 7;
-    public static final int kFrontRightTurningCanId = 6;
+    public static final int kRearLeftTurningCanId = 6;
+    public static final int kFrontRightTurningCanId = 7;
     public static final int kRearRightTurningCanId = 8;
 
     public static final boolean kGyroReversed = false;
@@ -109,5 +109,18 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+  }
+  public static final class ElevatorConstants {
+    public static final int ElevatorMotorPort = 12;
+    public static double kP = 0;
+    public static double kI = 0;
+    public static double kD = 0;
+    public static double kIz = 0;
+    public static double kFF = 0;
+    public static double kMaxOutput = 0;
+    public static double kMinOutput = 0;
+    public static double maxVel = 0;
+    public static double maxAccel = 0;
+    public static double allowedErr = 0;
   }
 }
