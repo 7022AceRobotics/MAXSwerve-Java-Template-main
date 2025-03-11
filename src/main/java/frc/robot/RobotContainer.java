@@ -24,10 +24,12 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.driveToCoralStation;
 import frc.robot.commands.driveToLeft;
 import frc.robot.commands.limelight;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LimelightHelpersC;
+import frc.robot.subsystems.PhotonVisionHelper;
 import frc.robot.util.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -52,6 +54,8 @@ public class RobotContainer {
   // The robot's limelight subsystems
   private final LimelightHelpers m_limelight_subsystem = new LimelightHelpers();
   private final LimelightHelpersC m_limelight_subsystem2 = new LimelightHelpersC();
+
+  private final PhotonVisionHelper m_photon_vision_subsystem = new PhotonVisionHelper(m_robotDrive);
 
   private final Optional<Alliance> ally = DriverStation.getAlliance();
 
@@ -112,6 +116,10 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
       new RunCommand(() -> m_robotDrive.zeroHeading())
+    );
+
+    new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
+      new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
     );
   }
 
