@@ -26,12 +26,12 @@ public final class Constants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds. 4.5 is max
     public static final double kMaxSpeedMetersPerSecond = 0.5;
-    public static final double kMaxAngularSpeed = Math.PI; // radians per second
+    public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(20);
+    public static final double kTrackWidth = Units.inchesToMeters(24);
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(23);
+    public static final double kWheelBase = Units.inchesToMeters(24);
     // Distance between front and back wheels on robot
 
     // Distance between centers of right and left wheels for new robot
@@ -45,10 +45,15 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
+    // public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
+    // public static final double kFrontRightChassisAngularOffset = 0;
+    // public static final double kBackLeftChassisAngularOffset = Math.PI;
+    // public static final double kBackRightChassisAngularOffset = Math.PI / 2;
+
+    public static final double kFrontLeftChassisAngularOffset = -Math.PI;
     public static final double kFrontRightChassisAngularOffset = 0;
-    public static final double kBackLeftChassisAngularOffset = Math.PI;
-    public static final double kBackRightChassisAngularOffset = Math.PI / 2 - Math.PI/10;
+    public static final double kBackLeftChassisAngularOffset = -Math.PI;
+    public static final double kBackRightChassisAngularOffset = 0;
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 1;
@@ -88,18 +93,18 @@ public final class Constants {
 
   public static final class AutoConstants {
     // Note that if kMaxSpeedMetersPerSecond will only be used if the speed of the robot during auto is greater than kMaxSpeedMetersPerSecond
-    public static final double kMaxSpeedMetersPerSecond = 3;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+    public static final double kMaxSpeedMetersPerSecond = 0.5;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 0.5;
     public static final double kMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = 2 * Math.PI;
 
-    public static final double kPXController = 1;
-    public static final double kPYController = 1;
+    public static final double kPXController = 1.1;
+    public static final double kPYController = 1.1;
 
     public static final double kIXController = 0;
     public static final double kIYController = 0;
 
-    public static final double kPThetaController = 1;
+    public static final double kPThetaController = 1.1;
     public static final double kIThetaController = 0;
 
     // Constraint for the motion profiled robot angle controller

@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -61,9 +62,14 @@ public class driveToLeft extends InstantCommand {
     int id = (int) id_dub;
     Pose2d position_of_apriltag = map.getTagPose(id).get().toPose2d();
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
-    pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1)).transformBy(new Transform2d(DriveConstants.kWheelBase/2, -0.127, new Rotation2d(0))).rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(-3.14159)).times(-1);
+    pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1)).transformBy(new Transform2d(DriveConstants.kWheelBase/2, -0.127, new Rotation2d(0))).rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(3.14159)).times(-1);
+    SmartDashboard.putNumber("P", position_of_apriltag.getRotation().getDegrees());
+    if(id != 7 && id != 10 && id != 18 && id != 21){
+      pose_final = new Pose2d(pose_final.getX(), pose_final.getY(), pose_final.getRotation().times(-1));
+      SmartDashboard.putNumber("F", pose_final.getRotation().getDegrees());
+    }
 
-    //m_drive_subsystem.resetOdometry(pose_initial);
+    //m_drive_subsystem.reseOdometry(pose_initial);
 
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
@@ -92,7 +98,7 @@ public class driveToLeft extends InstantCommand {
         m_drive_subsystem::setModuleStates,
         m_drive_subsystem);
 
-    swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false)).schedule();
+    swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
 
     SmartDashboard.putNumber("X1: ", pose_initial.getX());
     SmartDashboard.putNumber("Y1: ", pose_initial.getY());

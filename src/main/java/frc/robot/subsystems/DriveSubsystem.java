@@ -6,6 +6,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+
+import java.util.Optional;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,6 +20,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -93,6 +97,18 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     updateSwerveDrive(Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)), getSwerveModulePositions());
+
+    SmartDashboard.putNumber("FLDV", m_frontLeft.getDriveVoltage());
+    SmartDashboard.putNumber("FLTV", m_frontLeft.getTurnVoltage());
+    SmartDashboard.putNumber("FRDV", m_frontRight.getDriveVoltage());
+    SmartDashboard.putNumber("FRTV", m_frontRight.getTurnVoltage());
+
+    SmartDashboard.putNumber("RLDV", m_rearLeft.getDriveVoltage());
+    SmartDashboard.putNumber("RLTV", m_rearLeft.getTurnVoltage());
+    SmartDashboard.putNumber("RRDV", m_rearRight.getDriveVoltage());
+    SmartDashboard.putNumber("RRTV", m_rearRight.getTurnVoltage());
+
+    //SmartDashboard.putNumber("Setpoint", swerve;
   }
 
   /**
@@ -130,12 +146,15 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, Optional<Alliance> ally) {
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
+    if (ally.get() == Alliance.Red){
+      m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) + 180);
+    }
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
@@ -148,8 +167,18 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
 
+    if (ally.get() == Alliance.Red){
+      m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) - 180);
+    }
+
     SmartDashboard.putNumber("Y", getPose().getY());
     SmartDashboard.putNumber("X", getPose().getX());
+
+    SmartDashboard.putNumber("Theo", swerveModuleStates[0].speedMetersPerSecond);
+    SmartDashboard.putNumber("Act", m_frontLeft.getState().speedMetersPerSecond);
+
+    SmartDashboard.putNumber("Theo2", swerveModuleStates[1].speedMetersPerSecond);
+    SmartDashboard.putNumber("Act2", m_frontRight.getState().speedMetersPerSecond);
   }
 
   /**
@@ -190,7 +219,7 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.reset();
-    //m_gyro.setGyroAngleZ(180);
+    m_gyro.setGyroAngleZ(180);
   }
 
   /**

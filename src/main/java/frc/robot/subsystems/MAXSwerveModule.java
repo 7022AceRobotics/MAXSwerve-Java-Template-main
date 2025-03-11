@@ -111,4 +111,16 @@ public class MAXSwerveModule {
   public void resetEncoders() {
     m_drivingEncoder.setPosition(0);
   }
+
+  public double getDriveVoltage(){
+    return m_drivingSpark.getBusVoltage();
+  }
+
+  public double getTurnVoltage(){
+    return m_turningSpark.getBusVoltage();
+  }
+
+  public double getSpeed(){
+    return m_drivingSpark.getAppliedOutput();
+  }
 }

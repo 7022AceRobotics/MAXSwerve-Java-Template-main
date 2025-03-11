@@ -17,7 +17,9 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
@@ -35,6 +37,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.util.List;
+import java.util.Optional;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -49,6 +52,8 @@ public class RobotContainer {
   // The robot's limelight subsystems
   private final LimelightHelpers m_limelight_subsystem = new LimelightHelpers();
   private final LimelightHelpersC m_limelight_subsystem2 = new LimelightHelpersC();
+
+  private final Optional<Alliance> ally = DriverStation.getAlliance();
 
   // The robot's logging system
   //private DataLogManager DataLogManager = new DataLogManager();
@@ -78,7 +83,7 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                false),
+                true, ally),
             m_robotDrive));
 
     m_limelight_subsystem2.setDefaultCommand(new limelight(m_limelight_subsystem2, m_robotDrive));
@@ -154,6 +159,6 @@ public class RobotContainer {
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
     // Run path following command, then stop at the end.
-    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
+    return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, ally));
   }
 }
