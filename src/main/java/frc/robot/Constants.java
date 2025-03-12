@@ -4,7 +4,12 @@
 
 package frc.robot;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -25,7 +30,7 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds. 4.5 is max
-    public static final double kMaxSpeedMetersPerSecond = 0.5;
+    public static final double kMaxSpeedMetersPerSecond = 1;
     public static final double kMaxAngularSpeed = 2*Math.PI; // radians per second
 
     // Chassis configuration
@@ -93,18 +98,18 @@ public final class Constants {
 
   public static final class AutoConstants {
     // Note that if kMaxSpeedMetersPerSecond will only be used if the speed of the robot during auto is greater than kMaxSpeedMetersPerSecond
-    public static final double kMaxSpeedMetersPerSecond = 0.5;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 4.5;
+    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
     public static final double kMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = 2 * Math.PI;
 
-    public static final double kPXController = 1.1;
-    public static final double kPYController = 1.1;
+    public static final double kPXController = 1;
+    public static final double kPYController = 1;
 
     public static final double kIXController = 0;
     public static final double kIYController = 0;
 
-    public static final double kPThetaController = 1.1;
+    public static final double kPThetaController = 1;
     public static final double kIThetaController = 0;
 
     // Constraint for the motion profiled robot angle controller
@@ -149,5 +154,11 @@ public final class Constants {
     //Elevator Positions has to be positive
     public static final double OutPosistion = 0;
     public static final double InPosistion = 0;
+  }
+
+  public static final class MicrosoftCameraConstants{
+    public static final AprilTagFieldLayout map = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+    public static final Transform3d camToRobot = new Transform3d(new Translation3d(0, 0, Units.inchesToMeters(40)), new Rotation3d(0,0,0));
+    
   }
 }

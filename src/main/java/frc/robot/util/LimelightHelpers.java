@@ -7,6 +7,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.TimestampedDoubleArray;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.limelight;
 import frc.robot.util.LimelightHelpers.LimelightResults;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
@@ -1193,6 +1194,7 @@ public class LimelightHelpers {
     }
 
     public static double getFiducialID(String limelightName) {
+        //SmartDashboard.putNumber("AAAA", getLimelightNTDouble(limelightName, "tid"));
         return getLimelightNTDouble(limelightName, "tid");
     }
 

@@ -9,10 +9,13 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
 import java.util.Optional;
 
+import org.photonvision.PhotonPoseEstimator;
+
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -22,6 +25,7 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.MicrosoftCameraConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -71,6 +75,11 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.getPosition(),
     m_rearRight.getPosition()}, 
     new Pose2d());
+
+  public PhotonPoseEstimator m_photon_pose_estimator = new PhotonPoseEstimator(
+          MicrosoftCameraConstants.map, 
+          PhotonPoseEstimator.PoseStrategy.PNP_DISTANCE_TRIG_SOLVE, 
+          MicrosoftCameraConstants.camToRobot);
 
   public Field2d m_field = new Field2d();
 

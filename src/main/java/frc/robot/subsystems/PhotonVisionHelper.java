@@ -5,8 +5,10 @@
 package frc.robot.subsystems;
 
 import java.security.PublicKey;
+import java.util.Optional;
 
 import org.opencv.photo.Photo;
+import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonUtils;
@@ -14,7 +16,12 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.Nat;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.KalmanFilter;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -26,30 +33,35 @@ public class PhotonVisionHelper extends SubsystemBase {
 
   private DriveSubsystem m_drive_subsystem;
   private SwerveDrivePoseEstimator m_swerve_drive_pose_estimator;
+  private PhotonPoseEstimator m_photon_pose_estimator;
+
+  private Optional<EstimatedRobotPose> estimated_pose;
 
   /** Creates a new PhotonVisionHelper. */
   public PhotonVisionHelper(DriveSubsystem m_drive_subsystem) {
     this.m_drive_subsystem = m_drive_subsystem;
     this.m_swerve_drive_pose_estimator = m_drive_subsystem.m_swerve_drive_pose_estimator;
+    this.m_photon_pose_estimator = m_drive_subsystem.m_photon_pose_estimator;
   }
 
   @Override
+
   public void periodic() {
     camera.setPipelineIndex(2);
     var result = camera.getAllUnreadResults();
     if (!result.isEmpty()){
       var result2 = result.get(result.size() - 1);
-      PhotonTrackedTarget target = result2.getBestTarget();
-      Transform3d april_tag_pos = target.getBestCameraToTarget();
-      m_swerve_drive_pose_estimator.addVisionMeasurement(
-        m_swerve_drive_pose_estimator.getEstimatedPosition().transformBy(
-        new Transform2d(
-          april_tag_pos.getMeasureX(), 
-          april_tag_pos.getMeasureY(), 
-          april_tag_pos.getRotation().toRotation2d())), 
-          result2.getTimestampSeconds());
-      
-      SmartDashboard.putNumber("result", 0);
+      if (result2.hasTargets()){
+        PhotonTrackedTarget target = result2.getBestTarget();
+        Transform3d april_tag_pos = target.getBestCameraToTarget();
+
+        estimated_pose = m_photon_pose_estimator.update(result2);
+  
+        m_swerve_drive_pose_estimator.addVisionMeasurement(
+          estimated_pose.get().estimatedPose.toPose2d(),
+          estimated_pose.get().timestampSeconds);
+      }
+
     }
 
     this.m_drive_subsystem.resetOdometry(m_drive_subsystem.getPoseEstimate());

@@ -59,6 +59,7 @@ public class driveToLeft extends InstantCommand {
   @Override
   public void initialize() {
     id_dub = LimelightHelpers.getFiducialID("limelight");
+    if (id_dub != -1){
     int id = (int) id_dub;
     Pose2d position_of_apriltag = map.getTagPose(id).get().toPose2d();
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
@@ -100,22 +101,25 @@ public class driveToLeft extends InstantCommand {
 
     swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
 
-    SmartDashboard.putNumber("X1: ", pose_initial.getX());
-    SmartDashboard.putNumber("Y1: ", pose_initial.getY());
+    // SmartDashboard.putNumber("X1: ", pose_initial.getX());
+    // SmartDashboard.putNumber("Y1: ", pose_initial.getY());
 
-    SmartDashboard.putNumber("X2: ", pose_final.getX());
-    SmartDashboard.putNumber("Y2: ", pose_final.getY());
+    // SmartDashboard.putNumber("X2: ", pose_final.getX());
+    // SmartDashboard.putNumber("Y2: ", pose_final.getY());
 
-    SmartDashboard.putNumber("R: ", pose_initial.getRotation().getDegrees());
-    SmartDashboard.putNumber("R2: ", pose_final.getRotation().getDegrees());
+    // SmartDashboard.putNumber("R: ", pose_initial.getRotation().getDegrees());
+    // SmartDashboard.putNumber("R2: ", pose_final.getRotation().getDegrees());
     
     m_drive_subsystem.resetOdometry(exampleTrajectory.getInitialPose());
+    }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    if (id_dub != -1){
     swerveControllerCommand.end(interrupted);
+    }
   }
 
   // Returns true when the command should end.
