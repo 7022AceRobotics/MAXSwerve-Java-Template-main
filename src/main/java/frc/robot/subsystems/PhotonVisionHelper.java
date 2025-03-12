@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import java.security.PublicKey;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.opencv.photo.Photo;
 import org.photonvision.EstimatedRobotPose;
@@ -24,6 +25,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -55,11 +58,22 @@ public class PhotonVisionHelper extends SubsystemBase {
         PhotonTrackedTarget target = result2.getBestTarget();
         Transform3d april_tag_pos = target.getBestCameraToTarget();
 
+        m_photon_pose_estimator.addHeadingData(DriverStation.getMatchTime(), m_drive_subsystem.getHeading());
+
         estimated_pose = m_photon_pose_estimator.update(result2);
-  
+
+
+        
+        if (estimated_pose.isPresent()){
         m_swerve_drive_pose_estimator.addVisionMeasurement(
           estimated_pose.get().estimatedPose.toPose2d(),
           estimated_pose.get().timestampSeconds);
+
+
+          SmartDashboard.putNumber("X100", estimated_pose.get().estimatedPose.getX());
+          SmartDashboard.putNumber("Y100", estimated_pose.get().estimatedPose.getY());
+          SmartDashboard.putNumber("R100", Units.radiansToDegrees(estimated_pose.get().estimatedPose.getRotation().getAngle()));
+        }
       }
 
     }
@@ -77,5 +91,6 @@ public class PhotonVisionHelper extends SubsystemBase {
       return -1;
   }
 }
+
 
 }

@@ -63,7 +63,7 @@ public class driveToLeft extends InstantCommand {
     int id = (int) id_dub;
     Pose2d position_of_apriltag = map.getTagPose(id).get().toPose2d();
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
-    pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1)).transformBy(new Transform2d(DriveConstants.kWheelBase/2, -0.08, new Rotation2d(0))).rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(3.14159)).times(-1);
+    pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1)).transformBy(new Transform2d(DriveConstants.kWheelBase/2, 0.05, new Rotation2d(0))).rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(3.14159)).times(-1);
     SmartDashboard.putNumber("P", position_of_apriltag.getRotation().getDegrees());
     if(id != 7 && id != 10 && id != 18 && id != 21){
       pose_final = new Pose2d(pose_final.getX(), pose_final.getY(), pose_final.getRotation().times(-1));
