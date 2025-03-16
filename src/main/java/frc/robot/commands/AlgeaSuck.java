@@ -5,10 +5,10 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
+import frc.robot.Constants.AlgeaConstants;
 import frc.robot.subsystems.AlgeacollectorSubsystem;
-import frc.robot.subsystems.AlgeacollectorSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /** An example command that uses an example subsystem. */
 public class AlgeaSuck extends Command {
@@ -21,7 +21,7 @@ public class AlgeaSuck extends Command {
    * @param subsystem The subsystem used by this command.
    */
   public AlgeaSuck(AlgeacollectorSubsystem AlgeacollectorSubsystem) {
-    AlgeacollectorSubsystem = AlgeacollectorSubsystem;
+    this.AlgeacollectorSubsystem = AlgeacollectorSubsystem;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(AlgeacollectorSubsystem);
@@ -34,12 +34,19 @@ public class AlgeaSuck extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    AlgeacollectorSubsystem.SetAlgeaPosition(Constants.AlgeaConstants.OutPosistion);
-    AlgeacollectorSubsystem.PullSetSpeed(100);
-    if(AlgeacollectorSubsystem.Algeasensor()>0.4){
-      AlgeacollectorSubsystem.SetAlgeaPosition(Constants.AlgeaConstants.InPosistion);
+    // AlgeacollectorSubsystem.SetAlgeaPosition(Constants.AlgeaConstants.OutPosistion);
+    // AlgeacollectorSubsystem.PullSetSpeed(AlgeaConstants.suck_speed);
+    // if(AlgeacollectorSubsystem.Algeasensor()>AlgeaConstants.sensor_pos){
+    //   AlgeacollectorSubsystem.SetAlgeaPosition(Constants.AlgeaConstants.InPosistion);
+    // }
+    // AlgeacollectorSubsystem.PullSetSpeed(0.01);
+
+    AlgeacollectorSubsystem.SetAlgeaPosition(SmartDashboard.getNumber("Alg InPos", 0));
+    AlgeacollectorSubsystem.PullSetSpeed(AlgeaConstants.suck_speed);
+    if(AlgeacollectorSubsystem.Algeasensor()>AlgeaConstants.sensor_pos){
+      AlgeacollectorSubsystem.SetAlgeaPosition(SmartDashboard.getNumber("Alg OutPos", 0));
     }
-    AlgeacollectorSubsystem.PullSetSpeed(0);
+    AlgeacollectorSubsystem.PullSetSpeed(0.01);
   }
 
   // Called once the command ends or is interrupted.

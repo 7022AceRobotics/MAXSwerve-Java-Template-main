@@ -4,11 +4,8 @@
 
 package frc.robot.commands;
 
-import frc.robot.Constants;
-import frc.robot.subsystems.AlgeacollectorSubsystem;
 import frc.robot.subsystems.AlgeacollectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /** An example command that uses an example subsystem. */
 public class AlgeaShoot extends Command {
@@ -21,7 +18,7 @@ public class AlgeaShoot extends Command {
    * @param subsystem The subsystem used by this command.
    */
   public AlgeaShoot(AlgeacollectorSubsystem AlgeacollectorSubsystem) {
-    AlgeacollectorSubsystem = AlgeacollectorSubsystem;
+    this.AlgeacollectorSubsystem = AlgeacollectorSubsystem;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(AlgeacollectorSubsystem);
@@ -34,7 +31,7 @@ public class AlgeaShoot extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    AlgeacollectorSubsystem.PullSetSpeed(-50);
+    AlgeacollectorSubsystem.PullSetSpeed(-0.01);
   }
 
   // Called once the command ends or is interrupted.

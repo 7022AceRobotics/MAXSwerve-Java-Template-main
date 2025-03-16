@@ -7,6 +7,7 @@ package frc.robot.commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
@@ -34,13 +35,15 @@ public class Elevator_Stage2 extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    elevatorSubsystem.SetElevatorPosition(Constants.ElevatorConstants.Stage2Posistion);
+    //elevatorSubsystem.SetElevatorPosition(Constants.ElevatorConstants.Stage2Posistion);
+    elevatorSubsystem.SetElevatorPosition(SmartDashboard.getNumber("Stage2 Ele", 0));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    elevatorSubsystem.SetElevatorPosition(0);
+    //elevatorSubsystem.SetElevatorPosition(0);
+    elevatorSubsystem.SetElevatorPosition(SmartDashboard.getNumber("Stage0 Ele", 0));
   }
 
   // Returns true when the command should end.

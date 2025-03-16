@@ -24,9 +24,12 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.AlgeaShoot;
+import frc.robot.commands.AlgeaSuck;
 import frc.robot.commands.driveToCoralStation;
 import frc.robot.commands.driveToLeft;
 import frc.robot.commands.limelight;
+import frc.robot.subsystems.AlgeacollectorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LimelightHelpersC;
 import frc.robot.subsystems.PhotonVisionHelper;
@@ -56,6 +59,8 @@ public class RobotContainer {
   private final LimelightHelpersC m_limelight_subsystem2 = new LimelightHelpersC();
 
   private final PhotonVisionHelper m_photon_vision_subsystem = new PhotonVisionHelper(m_robotDrive);
+
+  private final AlgeacollectorSubsystem m_algae_collector_subsystem = new AlgeacollectorSubsystem();
 
   private final Optional<Alliance> ally = DriverStation.getAlliance();
 
@@ -121,6 +126,14 @@ public class RobotContainer {
     new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
       new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
     );
+
+    new JoystickButton(m_driverController, Button.kR1.value).whileTrue(
+      new AlgeaSuck(m_algae_collector_subsystem)
+    );
+
+    new JoystickButton(m_driverController, Button.kL1.value).whileTrue(
+      new AlgeaShoot(m_algae_collector_subsystem)
+    ); 
   }
 
   /**
