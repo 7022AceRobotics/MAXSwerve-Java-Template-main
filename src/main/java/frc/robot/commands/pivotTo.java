@@ -38,7 +38,7 @@ public class pivotTo extends Command {
   }
 
   public void execute(){
-    m_pivot_subsystem.goToPosition(position);
+    m_pivot_subsystem.goToPosition(m_pivot_subsystem.rotationPerDegree(position));
   }
 
   @Override

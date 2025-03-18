@@ -176,6 +176,25 @@ public final class Constants {
     public static final double sensor_pos = 0.4;
   }
 
+  public class PivotSubsystem {
+    public static final int PivotMotorPort = 12;
+    public static final double kP = 0;
+    public static final double kI = 0;
+    public static final double kD = 0;
+    public static final double kIz = 0;
+    public static final double kFF = 0;
+    public static final double kMaxOutput = 0;
+    public static final double kMinOutput = 0;
+    public static final double maxVel = 0;
+    public static final double maxAccel = 0;
+    public static final double allowedErr = 0;
+    //Elevator Positions has to be positive
+    public static final double OutPosistion = 0;
+    public static final double InPosistion = 0;
+
+    public static final double kGearRatio = 90;
+  }
+
   public static final class MicrosoftCameraConstants{
     public static final AprilTagFieldLayout map = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     public static final Transform3d camToRobot = new Transform3d(new Translation3d(0, 0, Units.inchesToMeters(40)), new Rotation3d(0,0,Math.PI));

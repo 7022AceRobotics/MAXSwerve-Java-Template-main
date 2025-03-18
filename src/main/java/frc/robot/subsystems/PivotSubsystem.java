@@ -43,6 +43,8 @@ public class PivotSubsystem extends SubsystemBase {
   public final SimpleWidget accel = tab.add("accel Piv", 0).withWidget(BuiltInWidgets.kTextView);
   public final SimpleWidget err = tab.add("err Piv", 0).withWidget(BuiltInWidgets.kTextView);
 
+  ShuffleboardTab tab = Shuffleboard.getTab("Pivot2");
+
 
   public PivotSubsystem() {
     this.m_pivot_motor = new SparkMax(12, MotorType.kBrushless);
@@ -54,7 +56,11 @@ public class PivotSubsystem extends SubsystemBase {
         .p(1)
         .i(0)
         .d(0)
-        .outputRange(-1, 1);
+        .outputRange(-1, 1)
+        .p(1, ClosedLoopSlot.kSlot1)
+        .i(0, ClosedLoopSlot.kSlot1)
+        .d(0, ClosedLoopSlot.kSlot1)
+        .velocityFF(0, ClosedLoopSlot.kSlot1);
     m_config.closedLoop.maxMotion
         .maxVelocity(5000)
         .maxAcceleration(2500)
@@ -73,5 +79,11 @@ public class PivotSubsystem extends SubsystemBase {
 
   public void goToPosition(double position){
     m_controller.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl);
+    m_controller.setReference(1, ControlType.kVelocity, 1);
+  }
+
+  public void rotationPerDegree(double degree){
+    // Converts negative to positive becuase neo is facing opposite direction, and I don't want to use the rev hardware client/
+    return -degree / 360 * PivotConstants.kGearRatio;
   }
 }
