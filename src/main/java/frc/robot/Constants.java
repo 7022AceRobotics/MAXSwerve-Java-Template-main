@@ -176,7 +176,7 @@ public final class Constants {
     public static final double sensor_pos = 0.4;
   }
 
-  public class PivotSubsystem {
+  public class PivotConstants {
     public static final int PivotMotorPort = 12;
     public static final double kP = 0;
     public static final double kI = 0;
@@ -192,7 +192,7 @@ public final class Constants {
     public static final double OutPosistion = 0;
     public static final double InPosistion = 0;
 
-    public static final double kGearRatio = 90;
+    public static final double kGearRatio = 135;
   }
 
   public static final class MicrosoftCameraConstants{

@@ -38,7 +38,7 @@ public class pivotTo extends Command {
   }
 
   public void execute(){
-    m_pivot_subsystem.goToPosition(m_pivot_subsystem.rotationPerDegree(position));
+    m_pivot_subsystem.goToPosition(m_pivot_subsystem.rotationPerDegree(SmartDashboard.getNumber("POS", 0)));
   }
 
   @Override

@@ -8,21 +8,25 @@ import java.util.Map;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.PivotConstants;
 
 public class PivotSubsystem extends SubsystemBase {
   /** Creates a new PivotSubsystem. */
@@ -43,7 +47,8 @@ public class PivotSubsystem extends SubsystemBase {
   public final SimpleWidget accel = tab.add("accel Piv", 0).withWidget(BuiltInWidgets.kTextView);
   public final SimpleWidget err = tab.add("err Piv", 0).withWidget(BuiltInWidgets.kTextView);
 
-  ShuffleboardTab tab = Shuffleboard.getTab("Pivot2");
+  private final SimpleWidget shooterEnable = tab.add("Shooter Enable", false).withWidget(BuiltInWidgets.kPIDController);
+
 
 
   public PivotSubsystem() {
@@ -70,6 +75,8 @@ public class PivotSubsystem extends SubsystemBase {
     //m_controller.setReference(0, SparkBase.ControlType.kMAXMotionPositionControl); 
 
     m_encoder.setPosition(0);
+    SmartDashboard.putNumber("POS", 0);
+    SmartDashboard.putNumber("SPEED", 0);
   }
 
   @Override
@@ -78,11 +85,12 @@ public class PivotSubsystem extends SubsystemBase {
   }
 
   public void goToPosition(double position){
-    m_controller.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl);
-    m_controller.setReference(1, ControlType.kVelocity, 1);
+      m_controller.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl);
+      SmartDashboard.putNumber("encoder val", position / PivotConstants.kGearRatio * 360);
+      //m_controller.setReference(SmartDashboard.getNumber("SPEED", 0), ControlType.kVelocity, ClosedLoopSlot.kSlot1);
   }
 
-  public void rotationPerDegree(double degree){
+  public double rotationPerDegree(double degree){
     // Converts negative to positive becuase neo is facing opposite direction, and I don't want to use the rev hardware client/
     return -degree / 360 * PivotConstants.kGearRatio;
   }

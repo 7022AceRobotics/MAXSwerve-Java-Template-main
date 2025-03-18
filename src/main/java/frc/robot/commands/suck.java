@@ -23,7 +23,7 @@ public class suck extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooting_subsystem.shoot(0.2);
+    m_shooting_subsystem.shoot(1);
   }
 
   // Called once the command ends or is interrupted.

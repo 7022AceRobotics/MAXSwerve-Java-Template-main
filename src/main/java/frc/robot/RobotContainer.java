@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -128,9 +129,9 @@ public class RobotContainer {
     //   new driveToLeft(m_robotDrive, m_limelight_subsystem)
     // );
 
-     new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
-      new RunCommand(() -> m_robotDrive.zeroHeading())
-     );
+    //  new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
+    //   new RunCommand(() -> m_robotDrive.zeroHeading())
+    //  );
 
     // new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
     //   new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
@@ -145,14 +146,18 @@ public class RobotContainer {
     // ); 
 
     new JoystickButton(m_driverController, Button.kCircle.value).whileTrue(
-      new pivotTo(m_pivot_subsystem, -30)
+      new pivotTo(m_pivot_subsystem, 0)
     );
 
     new JoystickButton(m_driverController, Button.kSquare.value).whileTrue(
-      new pivotTo(m_pivot_subsystem, -15)
+      new pivotTo(m_pivot_subsystem, 0)
     );
     new JoystickButton(m_driverController, Button.kCross.value).whileTrue(
       new suck(m_shooter_subsystem)
+    );
+
+    new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
+      new shoot(m_shooter_subsystem)
     );
   }
 
