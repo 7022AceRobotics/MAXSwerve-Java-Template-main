@@ -29,10 +29,15 @@ import frc.robot.commands.AlgeaSuck;
 import frc.robot.commands.driveToCoralStation;
 import frc.robot.commands.driveToLeft;
 import frc.robot.commands.limelight;
+import frc.robot.commands.pivotTo;
+import frc.robot.commands.shoot;
+import frc.robot.commands.suck;
 import frc.robot.subsystems.AlgeacollectorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LimelightHelpersC;
 import frc.robot.subsystems.PhotonVisionHelper;
+import frc.robot.subsystems.PivotSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.util.LimelightHelpers;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -43,6 +48,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import java.util.List;
 import java.util.Optional;
+
+import com.pathplanner.lib.auto.AutoBuilder;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -61,6 +68,8 @@ public class RobotContainer {
   private final PhotonVisionHelper m_photon_vision_subsystem = new PhotonVisionHelper(m_robotDrive);
 
   private final AlgeacollectorSubsystem m_algae_collector_subsystem = new AlgeacollectorSubsystem();
+  private final PivotSubsystem m_pivot_subsystem = new PivotSubsystem();
+  private final ShooterSubsystem m_shooter_subsystem = new ShooterSubsystem();
 
   private final Optional<Alliance> ally = DriverStation.getAlliance();
 
@@ -115,25 +124,36 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    new JoystickButton(m_driverController, Button.kCircle.value).toggleOnTrue(
-      new driveToLeft(m_robotDrive, m_limelight_subsystem)
-    );
+    // new JoystickButton(m_driverController, Button.kCircle.value).toggleOnTrue(
+    //   new driveToLeft(m_robotDrive, m_limelight_subsystem)
+    // );
 
-    new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
+     new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
       new RunCommand(() -> m_robotDrive.zeroHeading())
+     );
+
+    // new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
+    //   new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
+    // );
+
+    // new JoystickButton(m_driverController, Button.kR1.value).whileTrue(
+    //   new AlgeaSuck(m_algae_collector_subsystem)
+    // );
+
+    // new JoystickButton(m_driverController, Button.kL1.value).whileTrue(
+    //   new AlgeaShoot(m_algae_collector_subsystem)
+    // ); 
+
+    new JoystickButton(m_driverController, Button.kCircle.value).whileTrue(
+      new pivotTo(m_pivot_subsystem, -30)
     );
 
-    new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
-      new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
+    new JoystickButton(m_driverController, Button.kSquare.value).whileTrue(
+      new pivotTo(m_pivot_subsystem, -15)
     );
-
-    new JoystickButton(m_driverController, Button.kR1.value).whileTrue(
-      new AlgeaSuck(m_algae_collector_subsystem)
+    new JoystickButton(m_driverController, Button.kCross.value).whileTrue(
+      new suck(m_shooter_subsystem)
     );
-
-    new JoystickButton(m_driverController, Button.kL1.value).whileTrue(
-      new AlgeaShoot(m_algae_collector_subsystem)
-    ); 
   }
 
   /**

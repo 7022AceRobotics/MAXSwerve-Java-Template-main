@@ -2,7 +2,8 @@
   "NetworkTables": {
     "types": {
       "/FMSInfo": "FMSInfo",
-      "/SmartDashboard/Field": "Field2d"
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/PathPlanner": "Alerts"
     },
     "windows": {
       "/SmartDashboard/Field": {

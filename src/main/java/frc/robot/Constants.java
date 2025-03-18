@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import java.util.Map;
+
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -11,8 +16,14 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -31,13 +42,19 @@ public final class Constants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds. 4.5 is max
     public static final double kMaxSpeedMetersPerSecond = 1;
-    public static final double kMaxAngularSpeed = Math.PI/2; // radians per second
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+    public static final double kMaxAngularSpeed = Math.PI/2;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI/2;
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(24);
     // Distance between centers of right and left wheels on robot
     public static final double kWheelBase = Units.inchesToMeters(24);
     // Distance between front and back wheels on robot
+
+    public static final double kRobotWidth = Units.inchesToMeters(27);
+    public static final double kRobotLength = Units.inchesToMeters(27);
+    public static final double kBumperWidth = Units.inchesToMeters(3);
 
     // Distance between centers of right and left wheels for new robot
     //public static final double kWheelBase = Units.inchesToMeters(21.4);
@@ -55,10 +72,10 @@ public final class Constants {
     // public static final double kBackLeftChassisAngularOffset = Math.PI;
     // public static final double kBackRightChassisAngularOffset = Math.PI / 2;
 
-    public static final double kFrontLeftChassisAngularOffset = -Math.PI;
+    public static final double kFrontLeftChassisAngularOffset = Math.PI;
     public static final double kFrontRightChassisAngularOffset = 0;
-    public static final double kBackLeftChassisAngularOffset = -Math.PI;
-    public static final double kBackRightChassisAngularOffset = 0;
+    public static final double kBackLeftChassisAngularOffset = -Math.PI/2;
+    public static final double kBackRightChassisAngularOffset = Math.PI;
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 1;
@@ -121,7 +138,7 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
   public class ElevatorConstants {
-    public static final int ElevatorMotorPort = 12;
+    public static final int ElevatorMotorPort = 10;
     public static final double kP = 0;
     public static final double kI = 0;
     public static final double kD = 0;
@@ -139,8 +156,8 @@ public final class Constants {
     public static final double Stage4Posistion = 0;
   }
   public class AlgeaConstants {
-    public static final int AlgeaPivotMotorPort = 11;
-    public static final int AlgeaPullMotorPort = 10;
+    public static final int AlgeaPivotMotorPort = 13;
+    public static final int AlgeaPullMotorPort = 14;
     public static final double kP = 0;
     public static final double kI = 0;
     public static final double kD = 0;
@@ -163,5 +180,30 @@ public final class Constants {
     public static final AprilTagFieldLayout map = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
     public static final Transform3d camToRobot = new Transform3d(new Translation3d(0, 0, Units.inchesToMeters(40)), new Rotation3d(0,0,Math.PI));
     
+  }
+
+  public static final class PathPlannerConstants{
+    public static final ModuleConfig moduleConfig = new ModuleConfig
+    (ModuleConstants.kWheelDiameterMeters/2, 
+    0.85 * ModuleConstants.kDriveWheelFreeSpeedRps * ModuleConstants.kWheelCircumferenceMeters, 
+    0.97, 
+    DCMotor.getNEO(0), 
+    0, 
+    40, 
+    0);
+    
+    public static final RobotConfig robot = new RobotConfig(
+      Units.lbsToKilograms(95), 
+      1/12 * Units.lbsToKilograms(95) * 
+      (Math.pow(DriveConstants.kRobotWidth + 2*DriveConstants.kBumperWidth, 2) + 
+      Math.pow(DriveConstants.kRobotLength + 2*DriveConstants.kBumperWidth, 2)), 
+      moduleConfig, 
+      DriveConstants.kDriveKinematics.getModules());
+  }
+
+  public static final class ShuffleboardEntries{
+    public static final ShuffleboardTab tab = Shuffleboard.getTab("Pivot");
+    public static final GenericEntry pos = tab.add("Pos", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1)).getEntry();
+    public static final GenericEntry kP_piv = tab.add("Kp Piv", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1)).getEntry();
   }
 }

@@ -9,6 +9,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
@@ -27,10 +33,14 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.util.LimelightHelpers;
 
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import frc.robot.Constants.DriveConstants;
+
 
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
@@ -38,13 +48,16 @@ public class driveToRight extends Command {
   /** Creates a new driveToLeft. */
   private DriveSubsystem m_drive_subsystem;
   private LimelightHelpers m_limelight_subsystem;
-  private SwerveControllerCommand swerveControllerCommand;
+  private Command swerveControllerCommand;
   private AprilTagFieldLayout map = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   
   
   private double id_dub;
   private Pose2d pose_final;
   private Pose2d pose_initial;
+
+  private List<Waypoint> waypoints;
+  private PathPlannerPath path;
   
   //AprilTagFieldLayout map = new AprilTagFieldLayout((Path) AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark));
   //private Path file_path = FileSystem.getDeployDirectory().toPath().resolve(path_to_map);
@@ -67,7 +80,7 @@ public class driveToRight extends Command {
 
     pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
     .transformBy(new Transform2d(DriveConstants.kWheelBase/2, 0.05, new Rotation2d(0))).
-    rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(3.14159)).times(-1);
+    rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(Math.PI)).times(-1);
     
     SmartDashboard.putNumber("P", position_of_apriltag.getRotation().getDegrees());
     if(id != 7 && id != 10 && id != 18 && id != 21){
@@ -83,28 +96,30 @@ public class driveToRight extends Command {
         .setKinematics(DriveConstants.kDriveKinematics);
     //config.setReversed(true);
 
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        pose_initial,
-        List.of(),
-        pose_final,
-        config);
+    waypoints = PathPlannerPath.waypointsFromPoses(
+      new Pose2d(pose_initial.getX(), pose_initial.getY(), new Rotation2d(0)),
+      new Pose2d(pose_final.getX(), pose_final.getY(), new Rotation2d(0))
+    );
 
+    PathConstraints constraints = new PathConstraints(
+      DriveConstants.kMaxSpeedMetersPerSecond, 
+      DriveConstants.kMaxAccelerationMetersPerSecondSquared, 
+      DriveConstants.kMaxAngularSpeed, 
+      DriveConstants.kMaxAngularSpeedRadiansPerSecondSquared);
+
+    path = new PathPlannerPath(
+      waypoints, 
+      constraints, 
+      null, 
+      new GoalEndState(0, pose_final.getRotation()));
+    path.preventFlipping = true;
 
 
     var thetaController = new ProfiledPIDController(
         AutoConstants.kPThetaController, 0, AutoConstants.kIThetaController, AutoConstants.kThetaControllerConstraints);
     thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-    swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        m_drive_subsystem::getPose,
-        DriveConstants.kDriveKinematics,
-
-        new PIDController(AutoConstants.kPXController, 0, AutoConstants.kIXController),
-        new PIDController(AutoConstants.kPYController, 0, AutoConstants.kIYController),
-        thetaController,
-        m_drive_subsystem::setModuleStates,
-        m_drive_subsystem);
+    swerveControllerCommand = AutoBuilder.followPath(path);
 
     swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
 
@@ -117,7 +132,7 @@ public class driveToRight extends Command {
     // SmartDashboard.putNumber("R: ", pose_initial.getRotation().getDegrees());
     // SmartDashboard.putNumber("R2: ", pose_final.getRotation().getDegrees());
     
-    m_drive_subsystem.resetOdometry(exampleTrajectory.getInitialPose());
+    m_drive_subsystem.resetOdometry(pose_initial);
     }
   }
 

@@ -23,6 +23,7 @@ public class RudolphTheReindeer extends SubsystemBase {
   private AddressableLEDBuffer m_led_buffer = new AddressableLEDBuffer(60);
 
   public RudolphTheReindeer() { 
+    m_led.setLength(m_led_buffer.getLength());
   }
 
 
