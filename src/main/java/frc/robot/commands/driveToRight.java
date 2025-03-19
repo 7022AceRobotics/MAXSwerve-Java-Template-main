@@ -79,60 +79,20 @@ public class driveToRight extends Command {
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
 
     pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
-    .transformBy(new Transform2d(DriveConstants.kWheelBase/2, 0.05, new Rotation2d(0))).
-    rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(Math.PI)).times(-1);
+    .transformBy(new Transform2d(DriveConstants.kWheelBase/2, 0.05, new Rotation2d(0)))
+    .rotateBy(position_of_apriltag.getRotation())
+    .rotateBy(new Rotation2d(Math.PI))
+    .times(-1);
     
-    SmartDashboard.putNumber("P", position_of_apriltag.getRotation().getDegrees());
     if(id != 7 && id != 10 && id != 18 && id != 21){
       pose_final = new Pose2d(pose_final.getX(), pose_final.getY(), pose_final.getRotation().times(-1));
-      SmartDashboard.putNumber("F", pose_final.getRotation().getDegrees());
     }
 
-    //m_drive_subsystem.reseOdometry(pose_initial);
-
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        .setKinematics(DriveConstants.kDriveKinematics);
-    //config.setReversed(true);
-
-    waypoints = PathPlannerPath.waypointsFromPoses(
-      new Pose2d(pose_initial.getX(), pose_initial.getY(), new Rotation2d(0)),
-      new Pose2d(pose_final.getX(), pose_final.getY(), new Rotation2d(0))
-    );
-
-    PathConstraints constraints = new PathConstraints(
-      DriveConstants.kMaxSpeedMetersPerSecond, 
-      DriveConstants.kMaxAccelerationMetersPerSecondSquared, 
-      DriveConstants.kMaxAngularSpeed, 
-      DriveConstants.kMaxAngularSpeedRadiansPerSecondSquared);
-
-    path = new PathPlannerPath(
-      waypoints, 
-      constraints, 
-      null, 
-      new GoalEndState(0, pose_final.getRotation()));
-    path.preventFlipping = true;
-
-
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, AutoConstants.kIThetaController, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
+    path = m_drive_subsystem.getPathTo(pose_initial, pose_final);
     swerveControllerCommand = AutoBuilder.followPath(path);
 
     swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
 
-    // SmartDashboard.putNumber("X1: ", pose_initial.getX());
-    // SmartDashboard.putNumber("Y1: ", pose_initial.getY());
-
-    // SmartDashboard.putNumber("X2: ", pose_final.getX());
-    // SmartDashboard.putNumber("Y2: ", pose_final.getY());
-
-    // SmartDashboard.putNumber("R: ", pose_initial.getRotation().getDegrees());
-    // SmartDashboard.putNumber("R2: ", pose_final.getRotation().getDegrees());
-    
-    m_drive_subsystem.resetOdometry(pose_initial);
     }
   }
 
