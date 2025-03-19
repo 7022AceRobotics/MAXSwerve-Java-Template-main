@@ -14,9 +14,12 @@ import org.photonvision.PhotonPoseEstimator;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -28,6 +31,7 @@ import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.Configs;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MicrosoftCameraConstants;
 import frc.robot.Constants.PathPlannerConstants;
@@ -194,6 +198,11 @@ public class DriveSubsystem extends SubsystemBase {
     ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
+    // SlewRateLimiter filter = new SlewRateLimiter(2);
+    // xSpeedDelivered = filter.calculate(xSpeedDelivered);
+    // ySpeedDelivered = filter.calculate(ySpeedDelivered);
+    //rotDelivered = filter.calculate(rotDelivered);
+
     if (ally.get() == Alliance.Red){
       m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) + 180);
     }
@@ -317,5 +326,18 @@ public class DriveSubsystem extends SubsystemBase {
       ySpeedDelivered,
       rotDelivered
     );
+  }
+
+  public void resetPID(){
+    SparkMaxConfig newMaxConfig = new SparkMaxConfig();
+    Configs.MAXSwerveModule.drivingConfig.apply(
+    newMaxConfig
+    .idleMode(IdleMode.kBrake)
+    .smartCurrentLimit(50)
+
+    
+    );
+
+
   }
 }

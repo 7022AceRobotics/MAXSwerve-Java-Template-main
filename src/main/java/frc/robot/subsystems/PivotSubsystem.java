@@ -33,65 +33,90 @@ public class PivotSubsystem extends SubsystemBase {
   private final SparkMax m_pivot_motor;
   private final SparkClosedLoopController m_controller;
   private final RelativeEncoder m_encoder;
-  private final SparkBaseConfig m_config;
+  private SparkBaseConfig m_config;
+  
+    public final ShuffleboardTab tab = Shuffleboard.getTab("Pivot");
+    //public final SimpleWidget pos = tab.add("Pos", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
+    public final SimpleWidget pos = tab.add("Pos", 0).withWidget(BuiltInWidgets.kTextView);
+    public final SimpleWidget kP = tab.add("Kp Piv", 0).withWidget(BuiltInWidgets.kTextView);
+    public final SimpleWidget kI = tab.add("Ki Piv", 0).withWidget(BuiltInWidgets.kTextView);
+    public final SimpleWidget kD = tab.add("Kd Piv", 0).withWidget(BuiltInWidgets.kTextView);
+    public final SimpleWidget min = tab.add("min Piv", 0).withWidget(BuiltInWidgets.kTextView);
+    public final SimpleWidget max = tab.add("max Piv", 0).withWidget(BuiltInWidgets.kTextView);
+    public final SimpleWidget speed = tab.add("speed Piv", 0).withWidget(BuiltInWidgets.kTextView);
+    public final SimpleWidget accel = tab.add("accel Piv", 0).withWidget(BuiltInWidgets.kTextView);
+    public final SimpleWidget err = tab.add("err Piv", 0).withWidget(BuiltInWidgets.kTextView);
+  
+    private final SimpleWidget shooterEnable = tab.add("Shooter Enable", false).withWidget(BuiltInWidgets.kPIDController);
+  
+  
+  
+    public PivotSubsystem() {
+      this.m_pivot_motor = new SparkMax(12, MotorType.kBrushless);
+      this.m_controller = m_pivot_motor.getClosedLoopController();
+      this.m_encoder = m_pivot_motor.getEncoder();
+      this.m_config = new SparkMaxConfig();
+  
+      m_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(1)
+          .i(0)
+          .d(0)
+          .outputRange(-1, 1)
+          .p(1, ClosedLoopSlot.kSlot1)
+          .i(0, ClosedLoopSlot.kSlot1)
+          .d(0, ClosedLoopSlot.kSlot1)
+          .velocityFF(0, ClosedLoopSlot.kSlot1);
+      m_config.closedLoop.maxMotion
+          .maxVelocity(5000)
+          .maxAcceleration(2500)
+          .allowedClosedLoopError(0.05);
+  
+      m_pivot_motor.configure(m_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      //m_controller.setReference(0, SparkBase.ControlType.kMAXMotionPositionControl); 
+  
+      m_encoder.setPosition(0);
+      SmartDashboard.putNumber("POS", 0);
+      SmartDashboard.putNumber("SPEED", 0);
+      SmartDashboard.putNumber("kP", 0);
+      SmartDashboard.putNumber("ki", 0);
+      SmartDashboard.putNumber("kd", 0);
+    }
+  
+    @Override
+    public void periodic() {
+      // This method will be called once per scheduler run
+      SmartDashboard.putNumber("encoder val", -m_encoder.getPosition() / PivotConstants.kGearRatio * 360);
+    }
+  
+    public void goToPosition(double position){
+        m_controller.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl);
+        //m_controller.setReference(SmartDashboard.getNumber("SPEED", 0), ControlType.kVelocity, ClosedLoopSlot.kSlot1);
+    }
+  
+    public double rotationPerDegree(double degree){
+      // Converts negative to positive becuase neo is facing opposite direction, and I don't want to use the rev hardware client/
+      return -degree / 360 * PivotConstants.kGearRatio;
+    }
+  
+    public void changePIDValues(){
+  
+      m_config = new SparkMaxConfig();
 
-  public final ShuffleboardTab tab = Shuffleboard.getTab("Pivot");
-  //public final SimpleWidget pos = tab.add("Pos", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1))
-  public final SimpleWidget pos = tab.add("Pos", 0).withWidget(BuiltInWidgets.kTextView);
-  public final SimpleWidget kP = tab.add("Kp Piv", 0).withWidget(BuiltInWidgets.kTextView);
-  public final SimpleWidget kI = tab.add("Ki Piv", 0).withWidget(BuiltInWidgets.kTextView);
-  public final SimpleWidget kD = tab.add("Kd Piv", 0).withWidget(BuiltInWidgets.kTextView);
-  public final SimpleWidget min = tab.add("min Piv", 0).withWidget(BuiltInWidgets.kTextView);
-  public final SimpleWidget max = tab.add("max Piv", 0).withWidget(BuiltInWidgets.kTextView);
-  public final SimpleWidget speed = tab.add("speed Piv", 0).withWidget(BuiltInWidgets.kTextView);
-  public final SimpleWidget accel = tab.add("accel Piv", 0).withWidget(BuiltInWidgets.kTextView);
-  public final SimpleWidget err = tab.add("err Piv", 0).withWidget(BuiltInWidgets.kTextView);
-
-  private final SimpleWidget shooterEnable = tab.add("Shooter Enable", false).withWidget(BuiltInWidgets.kPIDController);
-
-
-
-  public PivotSubsystem() {
-    this.m_pivot_motor = new SparkMax(12, MotorType.kBrushless);
-    this.m_controller = m_pivot_motor.getClosedLoopController();
-    this.m_encoder = m_pivot_motor.getEncoder();
-    this.m_config = new SparkMaxConfig();
-
-    m_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .p(1)
-        .i(0)
-        .d(0)
+      m_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .p(SmartDashboard.getNumber("kP", 1))
+        .i(SmartDashboard.getNumber("ki", 0))
+        .d(SmartDashboard.getNumber("kD", 0))
         .outputRange(-1, 1)
         .p(1, ClosedLoopSlot.kSlot1)
         .i(0, ClosedLoopSlot.kSlot1)
         .d(0, ClosedLoopSlot.kSlot1)
         .velocityFF(0, ClosedLoopSlot.kSlot1);
     m_config.closedLoop.maxMotion
-        .maxVelocity(5000)
-        .maxAcceleration(2500)
+        .maxVelocity(1000)
+        .maxAcceleration(500)
         .allowedClosedLoopError(0.05);
 
     m_pivot_motor.configure(m_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    //m_controller.setReference(0, SparkBase.ControlType.kMAXMotionPositionControl); 
-
     m_encoder.setPosition(0);
-    SmartDashboard.putNumber("POS", 0);
-    SmartDashboard.putNumber("SPEED", 0);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
-
-  public void goToPosition(double position){
-      m_controller.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl);
-      SmartDashboard.putNumber("encoder val", position / PivotConstants.kGearRatio * 360);
-      //m_controller.setReference(SmartDashboard.getNumber("SPEED", 0), ControlType.kVelocity, ClosedLoopSlot.kSlot1);
-  }
-
-  public double rotationPerDegree(double degree){
-    // Converts negative to positive becuase neo is facing opposite direction, and I don't want to use the rev hardware client/
-    return -degree / 360 * PivotConstants.kGearRatio;
   }
 }

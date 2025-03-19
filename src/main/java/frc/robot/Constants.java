@@ -41,10 +41,10 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds. 4.5 is max
-    public static final double kMaxSpeedMetersPerSecond = 1;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
-    public static final double kMaxAngularSpeed = Math.PI/2;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI/2;
+    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 4.8;
+    public static final double kMaxAngularSpeed = Math.PI*2;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2;
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(24);
@@ -74,8 +74,8 @@ public final class Constants {
 
     public static final double kFrontLeftChassisAngularOffset = Math.PI;
     public static final double kFrontRightChassisAngularOffset = 0;
-    public static final double kBackLeftChassisAngularOffset = -Math.PI/2;
-    public static final double kBackRightChassisAngularOffset = Math.PI;
+    public static final double kBackLeftChassisAngularOffset = Math.PI;
+    public static final double kBackRightChassisAngularOffset = 0;
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 1;
@@ -115,10 +115,10 @@ public final class Constants {
 
   public static final class AutoConstants {
     // Note that if kMaxSpeedMetersPerSecond will only be used if the speed of the robot during auto is greater than kMaxSpeedMetersPerSecond
-    public static final double kMaxSpeedMetersPerSecond = 1;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI/2;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI/2;
+    public static final double kMaxSpeedMetersPerSecond = 4.8;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 4.8;
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI*2;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2;
 
     public static final double kPXController = 1;
     public static final double kPYController = 1;
@@ -154,6 +154,10 @@ public final class Constants {
     public static final double Stage2Posistion = 0;
     public static final double Stage3Posistion = 0;
     public static final double Stage4Posistion = 0;
+
+    public static final double kElevatorGearRatio = 10;
+    public static final double kTeethOnSprocket = 18;
+    public static final double pitch = 0.00635;
   }
   public class AlgeaConstants {
     public static final int AlgeaPivotMotorPort = 13;

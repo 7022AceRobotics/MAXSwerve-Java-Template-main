@@ -15,15 +15,19 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class RudolphTheReindeer extends SubsystemBase {
-  private AddressableLED m_led = new AddressableLED(9);
+  private AddressableLED m_led = new AddressableLED(0);
   private AddressableLEDBuffer m_led_buffer = new AddressableLEDBuffer(60);
 
   public RudolphTheReindeer() { 
     m_led.setLength(m_led_buffer.getLength());
+    m_led.setData(m_led_buffer);
+    m_led.start();
   }
 
 
@@ -31,6 +35,9 @@ public class RudolphTheReindeer extends SubsystemBase {
 
   public void periodic() {
     // This method will be called once per scheduler run
+    LEDPattern red = LEDPattern.solid(Color.kRed);
+    red.applyTo(m_led_buffer);
+    m_led.setData(m_led_buffer);
   }
 
   @Override

@@ -22,7 +22,7 @@ public class Elevator_Stage1 extends Command {
    * @param subsystem The subsystem used by this command.
    */
   public Elevator_Stage1(ElevatorSubsystem elevatorSubsystem) {
-    elevatorSubsystem = elevatorSubsystem;
+    this.elevatorSubsystem = elevatorSubsystem;
 
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(elevatorSubsystem);
@@ -36,14 +36,14 @@ public class Elevator_Stage1 extends Command {
   @Override
   public void execute() {
     // elevatorSubsystem.SetElevatorPosition(Constants.ElevatorConstants.Stage1Posistion);
-    elevatorSubsystem.SetElevatorPosition(SmartDashboard.getNumber("Stage1 Ele", 0));
+    elevatorSubsystem.SetElevatorPosition(elevatorSubsystem.metersToRotations(SmartDashboard.getNumber("POS", 0)));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
     //elevatorSubsystem.SetElevatorPosition(0);
-    elevatorSubsystem.SetElevatorPosition(SmartDashboard.getNumber("Stage0 Ele", 0));
+    elevatorSubsystem.SetElevatorPosition(elevatorSubsystem.metersToRotations(SmartDashboard.getNumber("Stage0 Ele", 0)));
   }
 
   // Returns true when the command should end.
