@@ -136,6 +136,7 @@ public final class Constants {
 
   public static final class NeoMotorConstants {
     public static final double kFreeSpeedRpm = 5676;
+    public static final double kSmartCurrentLimitConstant = 50;
   }
   public class ElevatorConstants {
     public static final int ElevatorMotorPort = 10;
@@ -159,9 +160,10 @@ public final class Constants {
     public static final double kTeethOnSprocket = 18;
     public static final double pitch = 0.00635;
   }
-  public class AlgeaConstants {
-    public static final int AlgeaPivotMotorPort = 13;
-    public static final int AlgeaPullMotorPort = 14;
+  public class AlgaeConstants {
+    public static final int kAlgaePivotMotorPort = 13;
+    public static final int kAlgaePullMotorPort = 14;
+    public static final int kAlgaeLightSensorPort = 3;
     public static final double kP = 0;
     public static final double kI = 0;
     public static final double kD = 0;
@@ -169,15 +171,15 @@ public final class Constants {
     public static final double kFF = 0;
     public static final double kMaxOutput = 0;
     public static final double kMinOutput = 0;
-    public static final double maxVel = 0;
-    public static final double maxAccel = 0;
-    public static final double allowedErr = 0;
+    public static final double kMaxVel = 0;
+    public static final double kMaxAccel = 0;
+    public static final double kAllowedErr = 0;
     //Elevator Positions has to be positive
-    public static final double OutPosistion = 0;
-    public static final double InPosistion = 0;
+    public static final double kOutPosistion = 0;
+    public static final double kInPosistion = 0;
 
-    public static final double suck_speed = 0.01;
-    public static final double sensor_pos = 0.4;
+    public static final double kSuckSpeed = 0.01;
+    public static final double kSensorPos = 0.4;
   }
 
   public class PivotConstants {
@@ -185,16 +187,19 @@ public final class Constants {
     public static final double kP = 0;
     public static final double kI = 0;
     public static final double kD = 0;
-    public static final double kIz = 0;
-    public static final double kFF = 0;
-    public static final double kMaxOutput = 0;
-    public static final double kMinOutput = 0;
-    public static final double maxVel = 0;
-    public static final double maxAccel = 0;
-    public static final double allowedErr = 0;
+    public static final double kMaxOutput = 1;
+    public static final double kMinOutput = -1;
+    public static final double kMaxVel = 5000;
+    public static final double kMaxAccel = 2500;
+    public static final double kAllowedErr = 0.05;
     //Elevator Positions has to be positive
-    public static final double OutPosistion = 0;
-    public static final double InPosistion = 0;
+    public static final double kL1 = 30; // measured in degrees
+    public static final double kL2 = 30;
+    public static final double kL3 = 30;
+    public static final double kL4 = 60;
+    public static final double kIntake = 75;
+    public static final double kAbsorb = 50;
+    public static final double kInPosistion = 0;
 
     public static final double kGearRatio = 135;
   }

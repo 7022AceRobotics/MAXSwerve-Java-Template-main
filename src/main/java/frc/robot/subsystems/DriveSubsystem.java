@@ -108,8 +108,8 @@ public class DriveSubsystem extends SubsystemBase {
             this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                    new PIDConstants(1.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(1.0, 0.0, 0.0) // Rotation PID constants
             ),
             PathPlannerConstants.robot, // The robot configuration
             () -> {
@@ -125,6 +125,13 @@ public class DriveSubsystem extends SubsystemBase {
             },
             this // Reference to this subsystem to set requirements
     );
+
+    SmartDashboard.putNumber("Drive P", 0);
+    SmartDashboard.putNumber("Drive I", 0);
+    SmartDashboard.putNumber("Drive D", 0);
+    SmartDashboard.putNumber("Turning P", 0);
+    SmartDashboard.putNumber("Turning I", 0);
+    SmartDashboard.putNumber("Turning D", 0);
   }
 
   @Override
@@ -143,16 +150,6 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     updateSwerveDrive(Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)), getSwerveModulePositions());
-
-    SmartDashboard.putNumber("FLDV", m_frontLeft.getDriveVoltage());
-    SmartDashboard.putNumber("FLTV", m_frontLeft.getTurnVoltage());
-    SmartDashboard.putNumber("FRDV", m_frontRight.getDriveVoltage());
-    SmartDashboard.putNumber("FRTV", m_frontRight.getTurnVoltage());
-
-    SmartDashboard.putNumber("RLDV", m_rearLeft.getDriveVoltage());
-    SmartDashboard.putNumber("RLTV", m_rearLeft.getTurnVoltage());
-    SmartDashboard.putNumber("RRDV", m_rearRight.getDriveVoltage());
-    SmartDashboard.putNumber("RRTV", m_rearRight.getTurnVoltage());
 
     //SmartDashboard.putNumber("Setpoint", swerve;
   }
@@ -222,8 +219,6 @@ public class DriveSubsystem extends SubsystemBase {
       m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) - 180);
     }
 
-    SmartDashboard.putNumber("Y", getPose().getY());
-    SmartDashboard.putNumber("X", getPose().getX());
 
     SmartDashboard.putNumber("Theo", swerveModuleStates[0].speedMetersPerSecond);
     SmartDashboard.putNumber("Act", m_frontLeft.getState().speedMetersPerSecond);
@@ -264,9 +259,6 @@ public class DriveSubsystem extends SubsystemBase {
     m_frontRight.setDesiredState(desiredStates[1]);
     m_rearLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
-
-    SmartDashboard.putNumber("Y", getPose().getY());
-    SmartDashboard.putNumber("X", getPose().getX());
   }
 
   /** Resets the drive encoders to currently read a position of 0. */
@@ -328,14 +320,92 @@ public class DriveSubsystem extends SubsystemBase {
     );
   }
 
-  public void resetPID(){
-    SparkMaxConfig newMaxConfig = new SparkMaxConfig();
-    Configs.MAXSwerveModule.drivingConfig.apply(
-    newMaxConfig
-    .idleMode(IdleMode.kBrake)
-    .smartCurrentLimit(50)
+  public PathPlannerTrajectory getPathTo(Pose2d pose_initial, Pose2d pose_final){
 
+    TrajectoryConfig config = new TrajectoryConfig(
+        AutoConstants.kMaxSpeedMetersPerSecond,
+        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+        .setKinematics(DriveConstants.kDriveKinematics);
+    //config.setReversed(true);
+
+    waypoints = PathPlannerPath.waypointsFromPoses(
+      new Pose2d(pose_initial.getX(), pose_initial.getY(), new Rotation2d(0)),
+      new Pose2d(pose_final.getX(), pose_final.getY(), new Rotation2d(0))
+    );
+
+    PathConstraints constraints = new PathConstraints(
+      DriveConstants.kMaxSpeedMetersPerSecond, 
+      DriveConstants.kMaxAccelerationMetersPerSecondSquared, 
+      DriveConstants.kMaxAngularSpeed, 
+      DriveConstants.kMaxAngularSpeedRadiansPerSecondSquared);
+
+    path = new PathPlannerPath(
+      waypoints, 
+      constraints, 
+      null, 
+      new GoalEndState(0, pose_final.getRotation()));
+    path.preventFlipping = true;
+
+
+    // VERY LIKELY TO BE EXCESSIVE. DEPRECATE POTENTIALLY
+    var thetaController = new ProfiledPIDController(
+        AutoConstants.kPThetaController, 0, AutoConstants.kIThetaController, AutoConstants.kThetaControllerConstraints);
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    resetOdometry(pose_initial);
+
+    return path;
+  }
+
+  public void resetPID(){
+
+    // USED FOR TESTING
+
+    SparkMaxConfig new_driving_config = new SparkMaxConfig();
+    SparkMaxConfig new_turning_config = new SparkMaxConfig();
+
+    double drivingFactor = ModuleConstants.kWheelDiameterMeters * Math.PI
+                    / ModuleConstants.kDrivingMotorReduction;
+    double turningFactor = 2 * Math.PI;
+    double drivingVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeedRps;
     
+    new_driving_config.idleMode(IdleMode.kBrake)
+      .smartCurrentLimit(50);
+
+      new_driving_config.encoder
+      .positionConversionFactor(drivingFactor) // meters
+      .velocityConversionFactor(drivingFactor / 60.0);
+
+      new_driving_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+      .p(SmartDashboard.getNumber("Drive P", 0))
+      .i(SmartDashboard.getNumber("Drive I", 0))
+      .d(SmartDashboard.getNumber("Drive D", 0))
+      .velocityFF(drivingVelocityFeedForward)
+      .outputRange(-1, 1)
+    
+      new_turning_config
+      .idleMode(IdleMode.kBrake)
+      .smartCurrentLimit(20);
+
+      new_turning_config.absoluteEncoder
+      .inverted(true)
+      .positionConversionFactor(turningFactor)
+      .velocityConversionFactor(turningFactor / 60.0);
+
+      new_tunring_config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+      .p(SmartDashboard.getNumber("Turning P", 0))
+      .i(SmartDashboard.getNumber("Turning I", 0))
+      .d(SmartDashboard.getNumber("Turning D", 0))
+      .velocityFF(drivingVelocityFeedForward)
+      .outputRange(-1, 1)
+      .positionWrappingEnabled(true)
+      .positionWrappingInputRange(0, turningFactor);
+    
+    Configs.MAXSwerveModule.drivingConfig.apply(
+      new_driving_config
+    );
+    Configs.MAXSwerveModule.turningConfig.apply(
+      new_turning_config
     );
 
 
