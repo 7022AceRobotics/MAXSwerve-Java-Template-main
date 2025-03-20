@@ -5,22 +5,22 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
-import frc.robot.Constants.AlgeaConstants;
-import frc.robot.subsystems.AlgeacollectorSubsystem;
+import frc.robot.Constants.AlgaeConstants;
+import frc.robot.subsystems.AlgaeCollectorSubsystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class AlgeaSuck extends Command {
+public class AlgaeSuck extends Command {
 
-  AlgeacollectorSubsystem AlgeacollectorSubsystem;
+  private AlgaeCollectorSubsystem AlgeacollectorSubsystem;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public AlgeaSuck(AlgeacollectorSubsystem AlgeacollectorSubsystem) {
+  public AlgaeSuck(AlgaeCollectorSubsystem AlgeacollectorSubsystem) {
     this.AlgeacollectorSubsystem = AlgeacollectorSubsystem;
 
     // Use addRequirements() here to declare subsystem dependencies.
@@ -41,10 +41,10 @@ public class AlgeaSuck extends Command {
     // }
     // AlgeacollectorSubsystem.PullSetSpeed(0.01);
 
-    AlgeacollectorSubsystem.SetAlgeaPosition(SmartDashboard.getNumber("Alg InPos", 0));
-    AlgeacollectorSubsystem.PullSetSpeed(AlgeaConstants.suck_speed);
-    if(AlgeacollectorSubsystem.Algeasensor()>AlgeaConstants.sensor_pos){
-      AlgeacollectorSubsystem.SetAlgeaPosition(SmartDashboard.getNumber("Alg OutPos", 0));
+    AlgeacollectorSubsystem.SetAlgaePosition(SmartDashboard.getNumber("Alg InPos", 0));
+    AlgeacollectorSubsystem.PullSetSpeed(AlgaeConstants.suck_speed);
+    if(AlgeacollectorSubsystem.AlgaeSensor()>AlgaeConstants.sensor_pos){
+      AlgeacollectorSubsystem.SetAlgaePosition(SmartDashboard.getNumber("Alg OutPos", 0));
     }
     AlgeacollectorSubsystem.PullSetSpeed(0.01);
   }

@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.epilogue.Logged.Strategy;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -25,17 +27,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.AlgeaShoot;
-import frc.robot.commands.AlgeaSuck;
-import frc.robot.commands.Elevator_Stage1;
+import frc.robot.commands.AlgaeShoot;
+import frc.robot.commands.AlgaeSuck;
 import frc.robot.commands.driveToCoralStation;
 import frc.robot.commands.driveToLeft;
 import frc.robot.commands.limelight;
+import frc.robot.commands.moveElevatorTo;
 import frc.robot.commands.pivotTo;
 import frc.robot.commands.resetPID;
+import frc.robot.commands.score2;
 import frc.robot.commands.shoot;
 import frc.robot.commands.suck;
-import frc.robot.subsystems.AlgeacollectorSubsystem;
+import frc.robot.subsystems.AlgaeCollectorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.LimelightHelpersC;
@@ -62,6 +65,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
+@Logged(strategy = Strategy.OPT_IN)
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -72,9 +76,11 @@ public class RobotContainer {
 
   private final PhotonVisionHelper m_photon_vision_subsystem = new PhotonVisionHelper(m_robotDrive);
 
-  private final AlgeacollectorSubsystem m_algae_collector_subsystem = new AlgeacollectorSubsystem();
+  private final AlgaeCollectorSubsystem m_algae_collector_subsystem = new AlgaeCollectorSubsystem();
   private final PivotSubsystem m_pivot_subsystem = new PivotSubsystem();
   private final ShooterSubsystem m_shooter_subsystem = new ShooterSubsystem();
+  
+  @Logged(name = "Elevator")
   private final ElevatorSubsystem m_elevator_subsystem = new ElevatorSubsystem();
 
   private final RudolphTheReindeer m_led_subsystem = new RudolphTheReindeer();
@@ -140,9 +146,9 @@ public class RobotContainer {
       new RunCommand(() -> m_robotDrive.zeroHeading())
      );
 
-    new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
-      new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
-    );
+    // new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
+    //   new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
+    // );
 
     // new JoystickButton(m_driverController, Button.kR1.value).whileTrue(
     //   new AlgeaSuck(m_algae_collector_subsystem)
@@ -152,9 +158,9 @@ public class RobotContainer {
     //   new AlgeaShoot(m_algae_collector_subsystem)
     // ); 
 
-    // new JoystickButton(m_driverController, Button.kCircle.value).whileTrue(
-    //   new Elevator_Stage1(m_elevator_subsystem)
-    // );
+    new JoystickButton(m_driverController, Button.kSquare.value).whileTrue(
+      new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 3)
+    );
 
     // new JoystickButton(m_driverController, Button.kSquare.value).whileTrue(
     //   new resetPID(m_pivot_subsystem, m_elevator_subsystem, "Elevator")
@@ -163,9 +169,9 @@ public class RobotContainer {
     //   new suck(m_shooter_subsystem)
     // );
 
-    // new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
-    //   new shoot(m_shooter_subsystem)
-    // );
+    new JoystickButton(m_driverController, Button.kCross.value).whileTrue(
+      new pivotTo(m_pivot_subsystem, 0)
+    );
   }
 
   /**

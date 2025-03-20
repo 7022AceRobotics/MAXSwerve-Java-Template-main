@@ -4,24 +4,24 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.AlgeacollectorSubsystem;
+import frc.robot.subsystems.AlgaeCollectorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class AlgeaShoot extends Command {
+public class AlgaeShoot extends Command {
 
-  AlgeacollectorSubsystem AlgeacollectorSubsystem;
+  private final AlgaeCollectorSubsystem m_algae_collector_subsystem;
 
   /**
    * Creates a new ExampleCommand.
    *
    * @param subsystem The subsystem used by this command.
    */
-  public AlgeaShoot(AlgeacollectorSubsystem AlgeacollectorSubsystem) {
-    this.AlgeacollectorSubsystem = AlgeacollectorSubsystem;
+  public AlgaeShoot(AlgaeCollectorSubsystem m_algae_collector_subsystem) {
+    this.m_algae_collector_subsystem = m_algae_collector_subsystem;
 
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(AlgeacollectorSubsystem);
+    addRequirements(m_algae_collector_subsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -31,13 +31,13 @@ public class AlgeaShoot extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    AlgeacollectorSubsystem.PullSetSpeed(-0.01);
+    m_algae_collector_subsystem.PullSetSpeed(-0.01);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    AlgeacollectorSubsystem.PullSetSpeed(0);
+    m_algae_collector_subsystem.PullSetSpeed(0);
 
   }
 

@@ -41,10 +41,10 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds. 4.5 is max
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 4.8;
-    public static final double kMaxAngularSpeed = Math.PI*2;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2;
+    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+    public static final double kMaxAngularSpeed = Math.PI*2/4.8;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2/4.8;
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(24);
@@ -115,10 +115,10 @@ public final class Constants {
 
   public static final class AutoConstants {
     // Note that if kMaxSpeedMetersPerSecond will only be used if the speed of the robot during auto is greater than kMaxSpeedMetersPerSecond
-    public static final double kMaxSpeedMetersPerSecond = 4.8;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 4.8;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI*2;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2;
+    public static final double kMaxSpeedMetersPerSecond = 1;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI*2/4.8;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2/4.8;
 
     public static final double kPXController = 1;
     public static final double kPYController = 1;
@@ -140,25 +140,26 @@ public final class Constants {
   }
   public class ElevatorConstants {
     public static final int ElevatorMotorPort = 10;
-    public static final double kP = 0;
+    public static final double kP = 0.7;
     public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kD = -1;
     public static final double kIz = 0;
     public static final double kFF = 0;
-    public static final double kMaxOutput = 0;
-    public static final double kMinOutput = 0;
-    public static final double maxVel = 0;
-    public static final double maxAccel = 0;
-    public static final double allowedErr = 0;
-    //Elevator Positions has to be positive
-    public static final double Stage1Posistion = 0;
-    public static final double Stage2Posistion = 0;
-    public static final double Stage3Posistion = 0;
-    public static final double Stage4Posistion = 0;
+    public static final double kMaxOutput = -1;
+    public static final double kMinOutput = 1;
+    public static final double maxVel = 5000;
+    public static final double maxAccel = 2500;
+    public static final double allowedErr = 0.05;
 
-    public static final double kElevatorGearRatio = 10;
+    public static final double kElevatorGearRatio = 40;
     public static final double kTeethOnSprocket = 18;
     public static final double pitch = 0.00635;
+
+    public static double kL1 = 0;
+    public static double kL2 = 0;
+    public static double kL3 = 0.219;
+    public static double kL4;
+    public static double kL0;
   }
   public class AlgaeConstants {
     public static final int kAlgaePivotMotorPort = 13;
@@ -180,11 +181,13 @@ public final class Constants {
 
     public static final double kSuckSpeed = 0.01;
     public static final double kSensorPos = 0.4;
+    public static final double sensor_pos = 0;
+    public static double suck_speed;
   }
 
   public class PivotConstants {
     public static final int PivotMotorPort = 12;
-    public static final double kP = 0;
+    public static final double kP = 0.75;
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double kMaxOutput = 1;
@@ -195,13 +198,14 @@ public final class Constants {
     //Elevator Positions has to be positive
     public static final double kL1 = 30; // measured in degrees
     public static final double kL2 = 30;
-    public static final double kL3 = 30;
+    public static final double kL3 = 87.04;
     public static final double kL4 = 60;
     public static final double kIntake = 75;
     public static final double kAbsorb = 50;
     public static final double kInPosistion = 0;
 
     public static final double kGearRatio = 135;
+    public static double kL0;
   }
 
   public static final class MicrosoftCameraConstants{

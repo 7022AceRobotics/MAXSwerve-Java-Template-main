@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.PhotonPoseEstimator;
@@ -14,10 +15,17 @@ import org.photonvision.PhotonPoseEstimator;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -27,13 +35,16 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.Configs;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MicrosoftCameraConstants;
+import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.PathPlannerConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -320,7 +331,10 @@ public class DriveSubsystem extends SubsystemBase {
     );
   }
 
-  public PathPlannerTrajectory getPathTo(Pose2d pose_initial, Pose2d pose_final){
+  public PathPlannerPath getPathTo(Pose2d pose_initial, Pose2d pose_final){
+
+    List<Waypoint> waypoints;
+    PathPlannerPath path;
 
     TrajectoryConfig config = new TrajectoryConfig(
         AutoConstants.kMaxSpeedMetersPerSecond,
@@ -381,7 +395,7 @@ public class DriveSubsystem extends SubsystemBase {
       .i(SmartDashboard.getNumber("Drive I", 0))
       .d(SmartDashboard.getNumber("Drive D", 0))
       .velocityFF(drivingVelocityFeedForward)
-      .outputRange(-1, 1)
+      .outputRange(-1, 1);
     
       new_turning_config
       .idleMode(IdleMode.kBrake)
@@ -392,7 +406,7 @@ public class DriveSubsystem extends SubsystemBase {
       .positionConversionFactor(turningFactor)
       .velocityConversionFactor(turningFactor / 60.0);
 
-      new_tunring_config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+      new_turning_config.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
       .p(SmartDashboard.getNumber("Turning P", 0))
       .i(SmartDashboard.getNumber("Turning I", 0))
       .d(SmartDashboard.getNumber("Turning D", 0))

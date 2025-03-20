@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -76,7 +77,21 @@ public class ElevatorSubsystem extends SubsystemBase {
       SmartDashboard.putNumber("Stage3 Ele", 0);
   }
 
-  public void SetElevatorPosition(double targetposition){
+  @Logged(name = "TargetPosition")
+  private double m_targetPosition;
+
+  @Logged(name = "currentPosition")
+  public double getPosition() {
+    return elevator_encoder.getPosition();
+  }
+
+  @Logged(name = "getCurrent")
+  public double getCurrent() {
+    return elevator_motor.getOutputCurrent();
+  }
+
+  public void SetElevatorPosition(double targetposition) {
+    m_targetPosition = targetposition;
     elevator_pidController.setReference(targetposition, ControlType.kMAXMotionPositionControl);    
   }
   
@@ -100,8 +115,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     .allowedClosedLoopError(0.05);
     
     elevator_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-     
-    elevator_encoder.setPosition(0);
   }
 
   public double metersToRotations(double meters){

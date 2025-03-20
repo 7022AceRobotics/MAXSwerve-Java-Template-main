@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.NeoMotorConstants;
 import frc.robot.Constants.PivotConstants;
 
 public class PivotSubsystem extends SubsystemBase {
@@ -41,7 +42,7 @@ public class PivotSubsystem extends SubsystemBase {
       this.m_encoder = m_pivot_motor.getEncoder();
       this.m_config = new SparkMaxConfig();
 
-      m_config.smartCurrentLimit(NeoMotorConstants.kSmartCurrentLimitConstant);
+      m_config.smartCurrentLimit((int) NeoMotorConstants.kSmartCurrentLimitConstant);
   
       m_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           .p(PivotConstants.kP)
@@ -55,11 +56,12 @@ public class PivotSubsystem extends SubsystemBase {
       m_config.closedLoop.maxMotion
           .maxVelocity(PivotConstants.kMaxVel)
           .maxAcceleration(PivotConstants.kMaxAccel)
-          .allowedClosedLoopError(kAllowedErr);
+          .allowedClosedLoopError(PivotConstants.kAllowedErr);
   
       m_pivot_motor.configure(m_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   
       m_encoder.setPosition(0);
+      SmartDashboard.putNumber("POS2", 0);
     }
   
     @Override
@@ -82,7 +84,7 @@ public class PivotSubsystem extends SubsystemBase {
       // FUNCTION USED FOR TESTING.
   
       m_config = new SparkMaxConfig();
-      m_config.smartCurrentLimit(NeoMotorConstants.kSmartCurrentLimitConstant);
+      m_config.smartCurrentLimit((int) NeoMotorConstants.kSmartCurrentLimitConstant);
       m_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(SmartDashboard.getNumber("kP", 1))
         .i(SmartDashboard.getNumber("ki", 0))

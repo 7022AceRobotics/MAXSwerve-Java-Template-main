@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.PivotConstants;
 import frc.robot.Constants.ShuffleboardEntries;
 import frc.robot.subsystems.PivotSubsystem;
 
@@ -38,12 +39,12 @@ public class pivotTo extends Command {
   }
 
   public void execute(){
-    m_pivot_subsystem.goToPosition(m_pivot_subsystem.rotationPerDegree(SmartDashboard.getNumber("POS", 0)));
+    m_pivot_subsystem.goToPosition(m_pivot_subsystem.rotationPerDegree(PivotConstants.kL3));
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_pivot_subsystem.goToPosition(0);
+    //m_pivot_subsystem.goToPosition(0);
   }
 
   // Returns true when the command should end.
