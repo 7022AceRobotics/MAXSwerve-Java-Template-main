@@ -8,6 +8,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -28,10 +29,11 @@ import frc.robot.Constants.NeoMotorConstants;
 public class ElevatorSubsystem extends SubsystemBase {
     private SparkMax elevator_motor;
     private SparkClosedLoopController elevator_pidController;
-    private RelativeEncoder elevator_encoder;
+    public RelativeEncoder elevator_encoder;
     private SparkBaseConfig config;
   /** Creates a new ElevatorSubsystem. */
   public ElevatorSubsystem() {
+    SmartDashboard.putNumber("ELE POS", 0);
     elevator_motor = new SparkMax(Constants.ElevatorConstants.ElevatorMotorPort, MotorType.kBrushless);
     elevator_pidController = elevator_motor.getClosedLoopController();
     elevator_encoder = elevator_motor.getEncoder();
@@ -48,33 +50,25 @@ public class ElevatorSubsystem extends SubsystemBase {
     //     .allowedClosedLoopError(Constants.ElevatorConstants.allowedErr);
     // elevator_pidController.setReference(0, SparkBase.ControlType.kMAXMotionPositionControl);    
 
+    // config.closedLoopRampRate(0.05);
     config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .p(SmartDashboard.getNumber("Kp Ele", 1))
-        .i(SmartDashboard.getNumber("Ki Ele", 0))
-        .d(SmartDashboard.getNumber("Kd Ele", 0))
+        .p(ElevatorConstants.kP)
+        .i(ElevatorConstants.kI)
+        .d(ElevatorConstants.kD)
         .outputRange(-1, 1)
         .p(1, ClosedLoopSlot.kSlot1)
           .i(0, ClosedLoopSlot.kSlot1)
           .d(0, ClosedLoopSlot.kSlot1)
-          .velocityFF(0, ClosedLoopSlot.kSlot1);;
+          .velocityFF(0, ClosedLoopSlot.kSlot1);
     config.closedLoop.maxMotion
-        .maxVelocity(1000)
-        .maxAcceleration(500)
-        .allowedClosedLoopError(0.05);
+        .maxVelocity(NeoMotorConstants.kFreeSpeedRpm)
+        .maxAcceleration(ElevatorConstants.maxAccel)
+        .allowedClosedLoopError(ElevatorConstants.allowedErr);
     //elevator_pidController.setReference(0, SparkBase.ControlType.kMAXMotionPositionControl);    
     
-    elevator_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    elevator_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
 
     elevator_encoder.setPosition(0);
-      SmartDashboard.putNumber("speed ele", 0);
-      SmartDashboard.putNumber("kp ele", 0);
-      SmartDashboard.putNumber("ki ele", 0);
-      SmartDashboard.putNumber("kd ele", 0);
-      SmartDashboard.putNumber("accel ele", 0);
-      SmartDashboard.putNumber("Stage0 Ele", 0);
-      SmartDashboard.putNumber("Stage1", 0);
-      SmartDashboard.putNumber("Stage2 Ele", 0);
-      SmartDashboard.putNumber("Stage3 Ele", 0);
   }
 
   @Logged(name = "TargetPosition")
@@ -92,7 +86,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public void SetElevatorPosition(double targetposition) {
     m_targetPosition = targetposition;
-    elevator_pidController.setReference(targetposition, ControlType.kMAXMotionPositionControl);    
+    elevator_pidController.setReference(targetposition, ControlType.kPosition);   
+    // elevator_pidController.setReference(targetposition, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, 0.1, ArbFFUnits.kPercentOut);
+    // elevator_pidController.setReference(0.05, ControlType.kDutyCycle);
+    //SmartDashboard.putNumber("AAAAAAAAAAAAAAA", 5); 
   }
   
   public void resetElevatorPID(){

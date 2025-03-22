@@ -41,10 +41,10 @@ public class AlgaeSuck extends Command {
     // }
     // AlgeacollectorSubsystem.PullSetSpeed(0.01);
 
-    AlgeacollectorSubsystem.SetAlgaePosition(SmartDashboard.getNumber("Alg InPos", 0));
+    AlgeacollectorSubsystem.SetAlgaePosition(AlgaeConstants.kOutPosistion);
     AlgeacollectorSubsystem.PullSetSpeed(AlgaeConstants.suck_speed);
     if(AlgeacollectorSubsystem.AlgaeSensor()>AlgaeConstants.sensor_pos){
-      AlgeacollectorSubsystem.SetAlgaePosition(SmartDashboard.getNumber("Alg OutPos", 0));
+      AlgeacollectorSubsystem.SetAlgaePosition(AlgaeConstants.kInPosistion);
     }
     AlgeacollectorSubsystem.PullSetSpeed(0.01);
   }

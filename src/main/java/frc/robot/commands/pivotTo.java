@@ -7,6 +7,7 @@ package frc.robot.commands;
 import java.util.Map;
 
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardComponent;
@@ -39,7 +40,16 @@ public class pivotTo extends Command {
   }
 
   public void execute(){
-    m_pivot_subsystem.goToPosition(m_pivot_subsystem.rotationPerDegree(PivotConstants.kL3));
+    /*
+    if (m_pivot_subsystem.rotationPerDegree(position) == -11.25 || position == 0){
+      m_pivot_subsystem.goToPosition(m_pivot_subsystem.rotationPerDegree(0));
+    }
+    else{
+      m_pivot_subsystem.goToPosition(m_pivot_subsystem.rotationPerDegree(position));
+  }*/
+  //-25 intake
+    m_pivot_subsystem.goToPosition(-position);
+  
   }
 
   @Override
@@ -50,6 +60,6 @@ public class pivotTo extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

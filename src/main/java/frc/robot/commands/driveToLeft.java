@@ -65,7 +65,7 @@ public class driveToLeft extends InstantCommand {
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
 
     pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
-    .transformBy(new Transform2d(DriveConstants.kWheelBase/2, 0.05, new Rotation2d(0))).
+    .transformBy(new Transform2d(DriveConstants.kWheelBase/2, 0, new Rotation2d(0))).
     rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(3.14159)).times(-1);
     
     SmartDashboard.putNumber("P", position_of_apriltag.getRotation().getDegrees());
@@ -80,7 +80,7 @@ public class driveToLeft extends InstantCommand {
         AutoConstants.kMaxSpeedMetersPerSecond,
         AutoConstants.kMaxAccelerationMetersPerSecondSquared)
         .setKinematics(DriveConstants.kDriveKinematics);
-    //config.setReversed(true);
+    config.setReversed(true);
 
     Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
         pose_initial,

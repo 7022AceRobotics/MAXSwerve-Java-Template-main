@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
@@ -86,6 +87,7 @@ public class DriveSubsystem extends SubsystemBase {
           m_rearRight.getPosition()
       });
 
+  //@Logged(name = "Odo")
   public SwerveDrivePoseEstimator m_swerve_drive_pose_estimator = new SwerveDrivePoseEstimator(
     DriveConstants.kDriveKinematics, 
     Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)), 

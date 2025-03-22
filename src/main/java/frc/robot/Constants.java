@@ -67,15 +67,15 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-    // public static final double kFrontLeftChassisAngularOffset = -Math.PI / 2;
-    // public static final double kFrontRightChassisAngularOffset = 0;
-    // public static final double kBackLeftChassisAngularOffset = Math.PI;
-    // public static final double kBackRightChassisAngularOffset = Math.PI / 2;
+     public static final double kFrontLeftChassisAngularOffset = 0;
+     public static final double kFrontRightChassisAngularOffset = Math.PI;
+     public static final double kBackLeftChassisAngularOffset = 0;
+     public static final double kBackRightChassisAngularOffset = -Math.PI;
 
-    public static final double kFrontLeftChassisAngularOffset = Math.PI;
-    public static final double kFrontRightChassisAngularOffset = 0;
-    public static final double kBackLeftChassisAngularOffset = Math.PI;
-    public static final double kBackRightChassisAngularOffset = 0;
+    //public static final double kFrontLeftChassisAngularOffset = Math.PI;
+    //public static final double kFrontRightChassisAngularOffset = 0;
+    //public static final double kBackLeftChassisAngularOffset = Math.PI;
+    //public static final double kBackRightChassisAngularOffset = 0;
 
     // SPARK MAX CAN IDs
     public static final int kFrontLeftDrivingCanId = 1;
@@ -140,9 +140,9 @@ public final class Constants {
   }
   public class ElevatorConstants {
     public static final int ElevatorMotorPort = 10;
-    public static final double kP = 0.7;
+    public static final double kP = 0.05;
     public static final double kI = 0;
-    public static final double kD = -1;
+    public static final double kD = 0;
     public static final double kIz = 0;
     public static final double kFF = 0;
     public static final double kMaxOutput = -1;
@@ -151,20 +151,22 @@ public final class Constants {
     public static final double maxAccel = 2500;
     public static final double allowedErr = 0.05;
 
-    public static final double kElevatorGearRatio = 40;
+    public static final double kElevatorGearRatio = 10;
     public static final double kTeethOnSprocket = 18;
     public static final double pitch = 0.00635;
 
-    public static double kL1 = 0;
-    public static double kL2 = 0;
-    public static double kL3 = 0.219;
-    public static double kL4;
-    public static double kL0;
+    public static double kL1 = 0.05;
+    public static double kL2 = 0.004;
+    public static double kL3 = 0.295273;
+    public static double kL4 = 0.5562; // 0.530946
+    public static double kL0 = 0;
+    public static double kLI = 0.05;
+    public static double kM;
   }
   public class AlgaeConstants {
     public static final int kAlgaePivotMotorPort = 13;
     public static final int kAlgaePullMotorPort = 14;
-    public static final int kAlgaeLightSensorPort = 3;
+    public static final int kAlgaeLightSensorPort = 1;
     public static final double kP = 0;
     public static final double kI = 0;
     public static final double kD = 0;
@@ -176,7 +178,7 @@ public final class Constants {
     public static final double kMaxAccel = 0;
     public static final double kAllowedErr = 0;
     //Elevator Positions has to be positive
-    public static final double kOutPosistion = 0;
+    public static final double kOutPosistion = 31.4;
     public static final double kInPosistion = 0;
 
     public static final double kSuckSpeed = 0.01;
@@ -195,17 +197,16 @@ public final class Constants {
     public static final double kMaxVel = 5000;
     public static final double kMaxAccel = 2500;
     public static final double kAllowedErr = 0.05;
-    //Elevator Positions has to be positive
-    public static final double kL1 = 30; // measured in degrees
-    public static final double kL2 = 30;
-    public static final double kL3 = 87.04;
-    public static final double kL4 = 60;
-    public static final double kIntake = 75;
-    public static final double kAbsorb = 50;
-    public static final double kInPosistion = 0;
+    //Pivot Positions has to be positive
+    public static final double kL0 = 0;
+    public static final double kL1 = 0; // measured in degrees 87.04
+    public static final double kL2 = 96;
+    public static final double kL3 = 75.04;
+    public static final double kL4 = 92.9515; //92.95
+    public static final double kLI = 74;// encoder
+    public static final double kM = 50;
 
     public static final double kGearRatio = 135;
-    public static double kL0;
   }
 
   public static final class MicrosoftCameraConstants{
@@ -225,8 +226,8 @@ public final class Constants {
     0);
     
     public static final RobotConfig robot = new RobotConfig(
-      Units.lbsToKilograms(95), 
-      1/12 * Units.lbsToKilograms(95) * 
+      Units.lbsToKilograms(105), 
+      1/12 * Units.lbsToKilograms(105) * 
       (Math.pow(DriveConstants.kRobotWidth + 2*DriveConstants.kBumperWidth, 2) + 
       Math.pow(DriveConstants.kRobotLength + 2*DriveConstants.kBumperWidth, 2)), 
       moduleConfig, 

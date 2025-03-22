@@ -19,6 +19,7 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -29,12 +30,16 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.NeoMotorConstants;
 import frc.robot.Constants.PivotConstants;
 
+
+
 public class PivotSubsystem extends SubsystemBase {
   /** Creates a new PivotSubsystem. */
   private final SparkMax m_pivot_motor;
   private final SparkClosedLoopController m_controller;
-  private final RelativeEncoder m_encoder;
+  public final RelativeEncoder m_encoder;
   private SparkBaseConfig m_config;
+  @Logged(name = "TargetPosition")
+  private double m_targetPosition;
   
     public PivotSubsystem() {
       this.m_pivot_motor = new SparkMax(PivotConstants.PivotMotorPort, MotorType.kBrushless);
@@ -61,17 +66,20 @@ public class PivotSubsystem extends SubsystemBase {
       m_pivot_motor.configure(m_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   
       m_encoder.setPosition(0);
-      SmartDashboard.putNumber("POS2", 0);
+      SmartDashboard.putNumber("PIV POS", 0);
     }
   
     @Override
     public void periodic() {
       // This method will be called once per scheduler run
-      SmartDashboard.putNumber("encoder val", -m_encoder.getPosition() / PivotConstants.kGearRatio * 360);
+      SmartDashboard.putNumber("encoder val", -m_encoder.getPosition());
     }
   
     public void goToPosition(double position){
-        m_controller.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl);
+      SmartDashboard.putNumber("BBBBBBBBBBBB", 5);
+      m_targetPosition = position;
+      m_controller.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl);
+    
     }
   
     public double rotationPerDegree(double degree){
@@ -101,5 +109,15 @@ public class PivotSubsystem extends SubsystemBase {
 
     m_pivot_motor.configure(m_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     m_encoder.setPosition(0);
+  }
+
+  @Logged(name = "currentPosition")
+  public double getPosition() {
+    return m_encoder.getPosition();
+  }
+
+  @Logged(name = "getCurrent")
+  public double getCurrent() {
+    return m_pivot_motor.getOutputCurrent();
   }
 }

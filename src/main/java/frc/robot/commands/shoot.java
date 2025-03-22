@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -11,9 +13,13 @@ import frc.robot.subsystems.ShooterSubsystem;
 public class shoot extends Command {
   /** Creates a new shoot. */
   private final ShooterSubsystem m_shooting_subsystem;
-  public shoot(ShooterSubsystem m_shooting_subsystem) {
+  private final Supplier<Double> m_axis;
+  private final Supplier<Double> m_axis2;
+  public shoot(ShooterSubsystem m_shooting_subsystem, Supplier<Double> m_axis, Supplier<Double> m_axis_2) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_shooting_subsystem = m_shooting_subsystem;
+    this.m_axis = m_axis;
+    this.m_axis2 =  m_axis_2;
   }
 
   // Called when the command is initially scheduled.
@@ -23,7 +29,12 @@ public class shoot extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_shooting_subsystem.shoot(-1);
+    if (m_axis.get() > 0.05){
+    m_shooting_subsystem.shoot(m_axis.get());
+    }
+    else if (m_axis2.get() > 0.05){
+      m_shooting_subsystem.shoot(m_axis2.get());
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -35,6 +46,6 @@ public class shoot extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

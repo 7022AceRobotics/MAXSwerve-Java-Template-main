@@ -54,6 +54,7 @@ public class AlgaeCollectorSubsystem extends SubsystemBase {
         .allowedClosedLoopError(AlgaeConstants.kAllowedErr);
 
     m_pivot_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     m_encoder.setPosition(0);
     
   }
@@ -74,6 +75,7 @@ public class AlgaeCollectorSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Algae", sensor.get());
   }
 
   @Override

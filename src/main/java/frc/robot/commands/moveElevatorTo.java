@@ -30,18 +30,17 @@ public class moveElevatorTo extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_elevator_subsystem.SetElevatorPosition(m_elevator_subsystem.metersToRotations(ElevatorConstants.kL3));
+    m_elevator_subsystem.SetElevatorPosition(m_elevator_subsystem.metersToRotations(m_position));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_shooter_subsystem.stop();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }

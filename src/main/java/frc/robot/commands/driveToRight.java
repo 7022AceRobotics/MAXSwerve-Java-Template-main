@@ -35,6 +35,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.PhotonVisionHelper;
 import frc.robot.util.LimelightHelpers;
 
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -63,9 +64,9 @@ public class driveToRight extends Command {
   //private Path file_path = FileSystem.getDeployDirectory().toPath().resolve(path_to_map);
 
   
-  public driveToRight(DriveSubsystem m_drive_subsystem, LimelightHelpers m_limelight_subsystem) {
+  public driveToRight(DriveSubsystem m_drive_subsystem, LimelightHelpers m_photon_vision_subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
-    this.m_limelight_subsystem = m_limelight_subsystem;
+    this.m_limelight_subsystem = m_photon_vision_subsystem;
     this.m_drive_subsystem = m_drive_subsystem;
   }
 
@@ -79,7 +80,7 @@ public class driveToRight extends Command {
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
 
     pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
-    .transformBy(new Transform2d(DriveConstants.kWheelBase/2, 0.05, new Rotation2d(0)))
+    .transformBy(new Transform2d(DriveConstants.kWheelBase/2, -0.05, new Rotation2d(0)))
     .rotateBy(position_of_apriltag.getRotation())
     .rotateBy(new Rotation2d(Math.PI))
     .times(-1);
@@ -89,7 +90,6 @@ public class driveToRight extends Command {
     }
 
     path = m_drive_subsystem.getPathTo(pose_initial, pose_final);
-    swerveControllerCommand = AutoBuilder.followPath(path);
 
     swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
 
