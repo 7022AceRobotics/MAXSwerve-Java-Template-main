@@ -51,17 +51,18 @@ public class ElevatorSubsystem extends SubsystemBase {
     // elevator_pidController.setReference(0, SparkBase.ControlType.kMAXMotionPositionControl);    
 
     // config.closedLoopRampRate(0.05);
+    config.smartCurrentLimit(50);
     config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(ElevatorConstants.kP)
         .i(ElevatorConstants.kI)
         .d(ElevatorConstants.kD)
-        .outputRange(-1, 1)
-        .p(1, ClosedLoopSlot.kSlot1)
+        .outputRange(-0.25, 0.7)
+        .p(1,ClosedLoopSlot.kSlot1)
           .i(0, ClosedLoopSlot.kSlot1)
-          .d(0, ClosedLoopSlot.kSlot1)
+          .d(0, ClosedLoopSlot.kSlot1)  
           .velocityFF(0, ClosedLoopSlot.kSlot1);
     config.closedLoop.maxMotion
-        .maxVelocity(NeoMotorConstants.kFreeSpeedRpm)
+        .maxVelocity(ElevatorConstants.maxVel)
         .maxAcceleration(ElevatorConstants.maxAccel)
         .allowedClosedLoopError(ElevatorConstants.allowedErr);
     //elevator_pidController.setReference(0, SparkBase.ControlType.kMAXMotionPositionControl);    
@@ -82,6 +83,11 @@ public class ElevatorSubsystem extends SubsystemBase {
   @Logged(name = "getCurrent")
   public double getCurrent() {
     return elevator_motor.getOutputCurrent();
+  }
+
+  @Logged(name = "getVelocity")
+  public double getVel() {
+    return elevator_encoder.getVelocity();
   }
 
   public void SetElevatorPosition(double targetposition) {

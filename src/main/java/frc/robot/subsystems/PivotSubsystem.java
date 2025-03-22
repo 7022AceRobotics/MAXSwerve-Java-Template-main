@@ -47,7 +47,7 @@ public class PivotSubsystem extends SubsystemBase {
       this.m_encoder = m_pivot_motor.getEncoder();
       this.m_config = new SparkMaxConfig();
 
-      m_config.smartCurrentLimit((int) NeoMotorConstants.kSmartCurrentLimitConstant);
+      m_config.smartCurrentLimit(20);
   
       m_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           .p(PivotConstants.kP)
@@ -94,9 +94,9 @@ public class PivotSubsystem extends SubsystemBase {
       m_config = new SparkMaxConfig();
       m_config.smartCurrentLimit((int) NeoMotorConstants.kSmartCurrentLimitConstant);
       m_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .p(SmartDashboard.getNumber("kP", 1))
-        .i(SmartDashboard.getNumber("ki", 0))
-        .d(SmartDashboard.getNumber("kD", 0))
+        .p(1.5)
+        .i(0)
+        .d(0)
         .outputRange(-1, 1)
         .p(1, ClosedLoopSlot.kSlot1)
         .i(0, ClosedLoopSlot.kSlot1)

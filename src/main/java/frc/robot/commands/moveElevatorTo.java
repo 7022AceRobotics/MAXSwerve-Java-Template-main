@@ -15,12 +15,10 @@ public class moveElevatorTo extends Command {
   /** Creates a new shoot. */
   private final ElevatorSubsystem m_elevator_subsystem;
   private final double m_position;
-  private final ShooterSubsystem m_shooter_subsystem;
   public moveElevatorTo(ElevatorSubsystem m_elevator_subsystem, double m_position, ShooterSubsystem m_shooter_subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_elevator_subsystem = m_elevator_subsystem;
     this.m_position = m_position; // note that position is calculated in meters.
-    this.m_shooter_subsystem = m_shooter_subsystem;
   }
 
   // Called when the command is initially scheduled.

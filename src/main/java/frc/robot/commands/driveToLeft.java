@@ -66,7 +66,7 @@ public class driveToLeft extends InstantCommand {
 
     pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
     .transformBy(new Transform2d(DriveConstants.kWheelBase/2, 0, new Rotation2d(0))).
-    rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(3.14159)).times(-1);
+    rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(3.14159));//.times(-1);
     
     SmartDashboard.putNumber("P", position_of_apriltag.getRotation().getDegrees());
     if(id != 7 && id != 10 && id != 18 && id != 21){

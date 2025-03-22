@@ -39,7 +39,7 @@ import frc.robot.commands.moveElevatorTo;
 import frc.robot.commands.pivotTo;
 import frc.robot.commands.resetPID;
 import frc.robot.commands.score2;
-import frc.robot.commands.shoot;
+import frc.robot.commands.shoot2;
 import frc.robot.commands.suck;
 import frc.robot.subsystems.AlgaeCollectorSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -121,14 +121,16 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
-                -MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(Math.pow(m_driverController.getLeftY(),3), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(Math.pow(m_driverController.getLeftX(), 3), OIConstants.kDriveDeadband),
+                MathUtil.applyDeadband(Math.pow(m_driverController.getRightX(),3), OIConstants.kDriveDeadband),
                 true, ally),
             m_robotDrive));
 
     m_limelight_subsystem2.setDefaultCommand(new limelight(m_limelight_subsystem2, m_robotDrive));
-    m_shooter_subsystem.setDefaultCommand(new shoot(m_shooter_subsystem, () -> m_driverController.getRawAxis(2)));
+
+    m_shooter_subsystem.setDefaultCommand(new suck(m_shooter_subsystem, ()->m_operator_controller.getRawAxis(2), ()->m_operator_controller.getRawAxis(3)));
+    //m_shooter_subsystem.setDefaultCommand(new suck(m_shooter_subsystem));
 
     autoChooser = AutoBuilder.buildAutoChooser();
 
@@ -136,7 +138,7 @@ public class RobotContainer {
 
     DataLogManager.start();
 
-    NamedCommands.registerCommand("L1", new suck(m_shooter_subsystem).withTimeout(10));
+    //NamedCommands.registerCommand("L1", new suck(m_shooter_subsystem, m_operator_controller.getRawAxis(2), m_operator_controller.getRawAxis(3)).withTimeout(10));
   }
 
   /**
@@ -154,20 +156,20 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    new JoystickButton(m_driverController, Button.kCircle.value).toggleOnTrue(
-      new driveToLeft(m_robotDrive, m_limelight_subsystem)
-    );
+    // new JoystickButton(m_driverController, Button.kCircle.value).toggleOnTrue(
+    //   new driveToLeft(m_robotDrive, m_limelight_subsystem)
+    // );
 
      new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
       new RunCommand(() -> m_robotDrive.zeroHeading())
      );
 
-    new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
-      new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
-    );
-    new JoystickButton(m_driverController, Button.kCross.value).toggleOnTrue(
-      new driveToRight(m_robotDrive, m_limelight_subsystem)
-    );
+    // new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
+    //   new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
+    // );
+    // new JoystickButton(m_driverController, Button.kCross.value).toggleOnTrue(
+    //   new driveToRight(m_robotDrive, m_limelight_subsystem)
+    //);
 
     // new JoystickButton(m_driverController, Button.kR1.value).whileTrue(
     //   new AlgeaSuck(m_algae_collector_subsystem)
@@ -177,37 +179,30 @@ public class RobotContainer {
     //   new AlgeaShoot(m_algae_collector_subsystem)
     // ); 
 
-    new JoystickButton(m_operator_controller, 10).whileTrue(
+    new JoystickButton(m_operator_controller, 3).whileTrue(
       new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 1)
     ); // smartdashboard Start
-    new JoystickButton(m_operator_controller, 9).whileTrue(
+    new JoystickButton(m_operator_controller, 1).whileTrue(
       new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 2)
-    ); // Level 2 Back
-    new JoystickButton(m_operator_controller, 4).whileTrue(
+     ); // Level 2 Back
+    new JoystickButton(m_operator_controller, 2).whileTrue(
       new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 3)
     ); // Level 3 Y
-    new JoystickButton(m_operator_controller, 5).whileTrue(
+    new JoystickButton(m_operator_controller, 4).whileTrue(
       new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 4)
     ); // Level 4 LB
-    new JoystickButton(m_operator_controller, 6).whileTrue(
+    new JoystickButton(m_operator_controller, 5).whileTrue(
       new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 5)
     ); // Level 1 RB
-    new JoystickButton(m_operator_controller, 8).whileTrue(
+    new JoystickButton(m_operator_controller, 6).whileTrue(
       new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 6)
-    ); // intake position RT
-    new JoystickButton(m_operator_controller, 1).whileTrue(
-      new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 0)
-    ); // rest posistion ; x
-
-    // new JoystickButton(m_driverController, Button.kSquare.value).whileTrue(4
-    //   new resetPID(m_pivot_subsystem, m_elevator_subsystem, "Elevator")
-    // );
-    new JoystickButton(m_operator_controller, 2).whileTrue(
-      new shoot(m_shooter_subsystem)
-    ); // intake/outake A
-    new JoystickButton(m_operator_controller, 3).whileTrue(
-      new suck(m_shooter_subsystem)
-      ); // Reverse B
+    );
+    // new JoystickButton(m_operator_controller, 8).whileTrue(
+    //   new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 6)
+    // ); // intake position RT
+    // new JoystickButton(m_operator_controller, 1).whileTrue(
+    //   new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 0)
+    // ); // rest posistion ; x
 
   }
 
@@ -254,9 +249,9 @@ public class RobotContainer {
     // Reset odometry to the starting pose of the trajectory.
     m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
-     return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, DriverStation.getAlliance()));
+    //return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, DriverStation.getAlliance()));
 
     // Run path following command, then stop at the end.
-     //return autoChooser.getSelected();
+    return autoChooser.getSelected();
   }
 }

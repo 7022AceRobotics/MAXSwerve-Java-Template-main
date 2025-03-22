@@ -41,10 +41,10 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds. 4.5 is max
-    public static final double kMaxSpeedMetersPerSecond = 1;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
-    public static final double kMaxAngularSpeed = Math.PI*2/4.8;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2/4.8;
+    public static final double kMaxSpeedMetersPerSecond = 4.8*ModuleConstants.kSpeedMulti;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3*ModuleConstants.kSpeedMulti;
+    public static final double kMaxAngularSpeed = Math.PI*2*ModuleConstants.kSpeedMulti;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2*ModuleConstants.kSpeedMulti;
 
     // Chassis configuration
     public static final double kTrackWidth = Units.inchesToMeters(24);
@@ -96,6 +96,7 @@ public final class Constants {
     // 13T, or 14T. This changes the drive speed of the module (a pinion gear with
     // more teeth will result in a robot that drives faster).
     public static final int kDrivingMotorPinionTeeth = 14;
+    public static final double kSpeedMulti = 0.5;
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
@@ -115,10 +116,10 @@ public final class Constants {
 
   public static final class AutoConstants {
     // Note that if kMaxSpeedMetersPerSecond will only be used if the speed of the robot during auto is greater than kMaxSpeedMetersPerSecond
-    public static final double kMaxSpeedMetersPerSecond = 1;
-    public static final double kMaxAccelerationMetersPerSecondSquared = 1;
-    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI*2/4.8;
-    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2/4.8;
+    public static final double kMaxSpeedMetersPerSecond = 4.8*ModuleConstants.kSpeedMulti;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 3*ModuleConstants.kSpeedMulti;
+    public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI*2*ModuleConstants.kSpeedMulti;
+    public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI*2*ModuleConstants.kSpeedMulti;
 
     public static final double kPXController = 1;
     public static final double kPYController = 1;
@@ -140,33 +141,33 @@ public final class Constants {
   }
   public class ElevatorConstants {
     public static final int ElevatorMotorPort = 10;
-    public static final double kP = 0.05;
+    public static final double kP = 0.25;
     public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kD = 0.01;
     public static final double kIz = 0;
     public static final double kFF = 0;
     public static final double kMaxOutput = -1;
     public static final double kMinOutput = 1;
-    public static final double maxVel = 5000;
-    public static final double maxAccel = 2500;
+    public static final double maxVel = 500;
+    public static final double maxAccel = 100;
     public static final double allowedErr = 0.05;
 
     public static final double kElevatorGearRatio = 10;
     public static final double kTeethOnSprocket = 18;
     public static final double pitch = 0.00635;
 
-    public static double kL1 = 0.05;
+    public static double kL1 = 0;
     public static double kL2 = 0.004;
-    public static double kL3 = 0.295273;
-    public static double kL4 = 0.5562; // 0.530946
+    public static double kL3 = 0.32;
+    public static double kL4 = 0.6; // 0.530946
     public static double kL0 = 0;
-    public static double kLI = 0.05;
+    public static double kLI = 0;
     public static double kM;
   }
   public class AlgaeConstants {
     public static final int kAlgaePivotMotorPort = 13;
     public static final int kAlgaePullMotorPort = 14;
-    public static final int kAlgaeLightSensorPort = 1;
+    public static final int kAlgaeLightSensorPort = 5;
     public static final double kP = 0;
     public static final double kI = 0;
     public static final double kD = 0;
@@ -189,7 +190,7 @@ public final class Constants {
 
   public class PivotConstants {
     public static final int PivotMotorPort = 12;
-    public static final double kP = 0.75;
+    public static final double kP = 0.3;
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double kMaxOutput = 1;
@@ -198,13 +199,13 @@ public final class Constants {
     public static final double kMaxAccel = 2500;
     public static final double kAllowedErr = 0.05;
     //Pivot Positions has to be positive
-    public static final double kL0 = 0;
+    public static final double kL0 = 0.04;
     public static final double kL1 = 0; // measured in degrees 87.04
-    public static final double kL2 = 96;
-    public static final double kL3 = 75.04;
-    public static final double kL4 = 92.9515; //92.95
-    public static final double kLI = 74;// encoder
-    public static final double kM = 50;
+    public static final double kL2 = 35;
+    public static final double kL3 = 35;
+    public static final double kL4 = 35; //92.95
+    public static final double kLI = 30;// 74 before encoder
+    public static final double kM = 20;
 
     public static final double kGearRatio = 135;
   }

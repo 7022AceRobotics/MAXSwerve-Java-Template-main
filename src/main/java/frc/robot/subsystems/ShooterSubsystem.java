@@ -19,26 +19,29 @@ public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ShooterSubystem. */
   private final SparkMax m_shooting_motor;
   private final AnalogPotentiometer m_sensor;
-  private final double[] m_sensor_values = {};
   private final SparkMaxConfig m_config;
+  private double sensor_values = 0;
+    
+    public ShooterSubsystem() {
+      m_shooting_motor = new SparkMax(11, MotorType.kBrushless);
+      m_sensor  = new AnalogPotentiometer(1);
+      m_config = new SparkMaxConfig();
   
-  public ShooterSubsystem() {
-    m_shooting_motor = new SparkMax(11, MotorType.kBrushless);
-    m_sensor  = new AnalogPotentiometer(1);
-    m_config = new SparkMaxConfig();
-
-    m_config.smartCurrentLimit(20);
-
-    m_shooting_motor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler ru
-  }
-
-  public void shoot(double speed){
-      m_shooting_motor.set(-speed);
+      m_config.smartCurrentLimit(20);
+  
+      m_shooting_motor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+  
+    @Override
+    public void periodic() {
+      // This method will be called once per scheduler ru
+    }
+  
+    public void shoot(double speed){
+      // if (!(sensor_values > 0.4 && m_sensor.get() < 0.2)){
+        m_shooting_motor.set(-speed);
+        // sensor_values = m_sensor.get();
+    //}
       }
     
   

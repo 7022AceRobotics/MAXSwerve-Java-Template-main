@@ -213,9 +213,9 @@ public class DriveSubsystem extends SubsystemBase {
     // ySpeedDelivered = filter.calculate(ySpeedDelivered);
     //rotDelivered = filter.calculate(rotDelivered);
 
-    if (ally.get() == Alliance.Red){
-      m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) + 180);
-    }
+    // if (ally.get() == Alliance.Red){
+    //   m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) + 180);
+    // }
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
@@ -228,9 +228,9 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
 
-    if (ally.get() == Alliance.Red){
-      m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) - 180);
-    }
+    // if (ally.get() == Alliance.Red){
+    //   m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) - 180);
+    // }
 
 
     SmartDashboard.putNumber("Theo", swerveModuleStates[0].speedMetersPerSecond);
