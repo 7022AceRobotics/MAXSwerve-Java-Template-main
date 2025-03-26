@@ -67,10 +67,10 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     // Angular offsets of the modules relative to the chassis in radians
-     public static final double kFrontLeftChassisAngularOffset = 0;
-     public static final double kFrontRightChassisAngularOffset = Math.PI;
-     public static final double kBackLeftChassisAngularOffset = 0;
-     public static final double kBackRightChassisAngularOffset = -Math.PI;
+     public static final double kFrontLeftChassisAngularOffset = -Math.PI/2;
+     public static final double kFrontRightChassisAngularOffset = 0;
+     public static final double kBackLeftChassisAngularOffset = Math.PI - 0.08;
+     public static final double kBackRightChassisAngularOffset = Math.PI/2;
 
     //public static final double kFrontLeftChassisAngularOffset = Math.PI;
     //public static final double kFrontRightChassisAngularOffset = 0;
@@ -96,11 +96,11 @@ public final class Constants {
     // 13T, or 14T. This changes the drive speed of the module (a pinion gear with
     // more teeth will result in a robot that drives faster).
     public static final int kDrivingMotorPinionTeeth = 14;
-    public static final double kSpeedMulti = 0.5;
+    public static final double kSpeedMulti = 1;
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = 0.0762;
+    public static final double kWheelDiameterMeters = Units.inchesToMeters(3);
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
     // teeth on the bevel pinion
@@ -204,7 +204,7 @@ public final class Constants {
     public static final double kL2 = 35;
     public static final double kL3 = 35;
     public static final double kL4 = 35; //92.95
-    public static final double kLI = 30;// 74 before encoder
+    public static final double kLI = 25;// 74 before encoder
     public static final double kM = 20;
 
     public static final double kGearRatio = 135;
@@ -212,23 +212,25 @@ public final class Constants {
 
   public static final class MicrosoftCameraConstants{
     public static final AprilTagFieldLayout map = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
-    public static final Transform3d camToRobot = new Transform3d(new Translation3d(0, 0, Units.inchesToMeters(40)), new Rotation3d(0,0,Math.PI));
+    public static final Transform3d camToRobot = new Transform3d(
+      new Translation3d(0, 0, Units.inchesToMeters(40)), 
+      new Rotation3d(0,0,Math.PI));
     
   }
 
   public static final class PathPlannerConstants{
     public static final ModuleConfig moduleConfig = new ModuleConfig
-    (ModuleConstants.kWheelDiameterMeters/2, 
-    0.85 * ModuleConstants.kDriveWheelFreeSpeedRps * ModuleConstants.kWheelCircumferenceMeters, 
+    (ModuleConstants.kWheelDiameterMeters/2.0, 
+    0.85 * DriveConstants.kMaxSpeedMetersPerSecond, 
     0.97, 
-    DCMotor.getNEO(0), 
-    0, 
-    40, 
-    0);
+    DCMotor.getNEO(1), 
+    4.71, 
+    50, 
+    1);
     
     public static final RobotConfig robot = new RobotConfig(
-      Units.lbsToKilograms(105), 
-      1/12 * Units.lbsToKilograms(105) * 
+      Units.lbsToKilograms(115), 
+      0.0833333 * Units.lbsToKilograms(115) * 
       (Math.pow(DriveConstants.kRobotWidth + 2*DriveConstants.kBumperWidth, 2) + 
       Math.pow(DriveConstants.kRobotLength + 2*DriveConstants.kBumperWidth, 2)), 
       moduleConfig, 
@@ -239,5 +241,9 @@ public final class Constants {
     public static final ShuffleboardTab tab = Shuffleboard.getTab("Pivot");
     public static final GenericEntry pos = tab.add("Pos", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1)).getEntry();
     public static final GenericEntry kP_piv = tab.add("Kp Piv", 0).withWidget(BuiltInWidgets.kNumberSlider).withProperties(Map.of("min", -1, "max", 1)).getEntry();
+  }
+
+  public class changing_vars{
+    public static double speed_multi_change = 0.75;
   }
 }

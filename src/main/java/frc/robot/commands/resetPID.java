@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.PivotSubsystem;
 
@@ -14,11 +15,13 @@ import frc.robot.subsystems.PivotSubsystem;
 public class resetPID extends InstantCommand {
   private final PivotSubsystem m_pivot_subsystem;
   private final ElevatorSubsystem m_elevator_subsystem;
+  private final DriveSubsystem m_drive_subsystem;
   private final String subsystem;
-  public resetPID(PivotSubsystem m_pivot_subsystem, ElevatorSubsystem m_elevator_subsystem, String subsystem) {
+  public resetPID(PivotSubsystem m_pivot_subsystem, ElevatorSubsystem m_elevator_subsystem, DriveSubsystem m_drive_subsystem, String subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_pivot_subsystem = m_pivot_subsystem;
     this.m_elevator_subsystem = m_elevator_subsystem;
+    this.m_drive_subsystem = m_drive_subsystem;
     this.subsystem = subsystem;
   }
 
@@ -31,6 +34,9 @@ public class resetPID extends InstantCommand {
     else if (subsystem == "Elevator"){
 
       m_elevator_subsystem.resetElevatorPID();
+    }
+    else if (subsystem == "Drive"){
+      m_drive_subsystem.resetPID();
     }
     
   }

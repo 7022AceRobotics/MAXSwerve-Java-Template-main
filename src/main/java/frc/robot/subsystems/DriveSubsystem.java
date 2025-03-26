@@ -17,6 +17,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -47,31 +48,40 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.MicrosoftCameraConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.PathPlannerConstants;
+import frc.robot.Constants.changing_vars;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
-  private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
+  private MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
       DriveConstants.kFrontLeftTurningCanId,
-      DriveConstants.kFrontLeftChassisAngularOffset);
+      DriveConstants.kFrontLeftChassisAngularOffset,
+      Configs.MAXSwerveModule.turningConfig,
+      Configs.MAXSwerveModule.turningConfig);
 
-  private final MAXSwerveModule m_frontRight = new MAXSwerveModule(
+  private MAXSwerveModule m_frontRight = new MAXSwerveModule(
       DriveConstants.kFrontRightDrivingCanId,
       DriveConstants.kFrontRightTurningCanId,
-      DriveConstants.kFrontRightChassisAngularOffset);
+      DriveConstants.kFrontRightChassisAngularOffset,
+      Configs.MAXSwerveModule.turningConfig,
+      Configs.MAXSwerveModule.turningConfig);
 
-  private final MAXSwerveModule m_rearLeft = new MAXSwerveModule(
+  private MAXSwerveModule m_rearLeft = new MAXSwerveModule(
       DriveConstants.kRearLeftDrivingCanId,
       DriveConstants.kRearLeftTurningCanId,
-      DriveConstants.kBackLeftChassisAngularOffset);
+      DriveConstants.kBackLeftChassisAngularOffset,
+      Configs.MAXSwerveModule.turningConfig,
+      Configs.MAXSwerveModule.turningConfig);
 
-  private final MAXSwerveModule m_rearRight = new MAXSwerveModule(
+  private MAXSwerveModule m_rearRight = new MAXSwerveModule(
       DriveConstants.kRearRightDrivingCanId,
       DriveConstants.kRearRightTurningCanId,
-      DriveConstants.kBackRightChassisAngularOffset);
+      DriveConstants.kBackRightChassisAngularOffset,
+      Configs.MAXSwerveModule.turningConfig,
+      Configs.MAXSwerveModule.turningConfig);
 
   // The gyro sensor
   public final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
@@ -121,8 +131,8 @@ public class DriveSubsystem extends SubsystemBase {
             this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(1.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(1.0, 0.0, 0.0) // Rotation PID constants
+                    new PIDConstants(3, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(2, 0.0, 0.0) // Rotation PID constants
             ),
             PathPlannerConstants.robot, // The robot configuration
             () -> {
@@ -172,6 +182,7 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return The pose.
    */
+  @Logged(name="joe is a bad driver")
   public Pose2d getPose() {
     return m_odometry.getPoseMeters();
   }
@@ -204,33 +215,35 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative, Optional<Alliance> ally) {
     // Convert the commanded speeds into the correct units for the drivetrain
-    xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
-    rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
+    xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond * changing_vars.speed_multi_change;
+    ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond * changing_vars.speed_multi_change;
+    rotDelivered = rot * DriveConstants.kMaxAngularSpeed * changing_vars.speed_multi_change;
 
     // SlewRateLimiter filter = new SlewRateLimiter(2);
     // xSpeedDelivered = filter.calculate(xSpeedDelivered);
     // ySpeedDelivered = filter.calculate(ySpeedDelivered);
     //rotDelivered = filter.calculate(rotDelivered);
 
-    // if (ally.get() == Alliance.Red){
-    //   m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) + 180);
-    // }
+    if (ally.get() == Alliance.Red){
+      m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) + 180);
+    }
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-        fieldRelative
+      ChassisSpeeds.discretize(fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
                 Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)))
-            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
-    SwerveDriveKinematics.desaturateWheelSpeeds(
+            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered), 0.02));
+    //ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(wheelSpeeds, 0.02);
+
+  SwerveDriveKinematics.desaturateWheelSpeeds(
         swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleStates[0]);
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
 
-    // if (ally.get() == Alliance.Red){
-    //   m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) - 180);
-    // }
+    if (ally.get() == Alliance.Red){
+      m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) - 180);
+    }
 
 
     SmartDashboard.putNumber("Theo", swerveModuleStates[0].speedMetersPerSecond);
@@ -241,7 +254,7 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   public void driveRobotRelative(ChassisSpeeds wheelSpeeds) {
-    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(wheelSpeeds, 0.02);
+    ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(wheelSpeeds, 0.08);
     var swerveModuleState = DriveConstants.kDriveKinematics.toSwerveModuleStates(targetSpeeds);
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleState, DriveConstants.kMaxSpeedMetersPerSecond);
     m_frontLeft.setDesiredState(swerveModuleState[0]);
@@ -293,9 +306,11 @@ public class DriveSubsystem extends SubsystemBase {
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
+  @Logged(name="Swerve_Rotation")
   public Rotation2d getHeading() {
     return Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ));
   }
+
 
   /**
    * Returns the turn rate of the robot.
@@ -325,15 +340,22 @@ public class DriveSubsystem extends SubsystemBase {
     return m_swerve_drive_pose_estimator.getEstimatedPosition();
   }
 
+  @Logged(name="ChassisSpeeds")
   public ChassisSpeeds getChassisSpeeds(){
-    return new ChassisSpeeds(
-      xSpeedDelivered,
-      ySpeedDelivered,
-      rotDelivered
-    );
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(getSwerveModuleStateCus());
   }
 
-  public PathPlannerPath getPathTo(Pose2d pose_initial, Pose2d pose_final){
+  @Logged(name="swerve_positions")
+  public SwerveModuleState[] getSwerveModuleStateCus(){
+    SwerveModuleState[] states = new SwerveModuleState[4];
+    states[0] = m_frontLeft.getState();
+    states[1] = m_frontRight.getState();
+    states[2] = m_rearLeft.getState();
+    states[3] = m_rearRight.getState();
+    return states;
+  }
+
+  public PathPlannerPath getPathTo(Pose2d pose_initial, Pose2d pose_final, Pose2d pose_middle){
 
     List<Waypoint> waypoints;
     PathPlannerPath path;
@@ -346,19 +368,26 @@ public class DriveSubsystem extends SubsystemBase {
 
     waypoints = PathPlannerPath.waypointsFromPoses(
       new Pose2d(pose_initial.getX(), pose_initial.getY(), new Rotation2d(0)),
+      //new Pose2d(pose_middle.getX(), pose_middle.getY(), new Rotation2d(0)),
       new Pose2d(pose_final.getX(), pose_final.getY(), new Rotation2d(0))
     );
 
+    // waypoints = PathPlannerPath.waypointsFromPoses(
+    //   pose_initial,
+    //   pose_middle,
+    //   pose_final
+    // );
+    var test10 = 0.75;
     PathConstraints constraints = new PathConstraints(
-      DriveConstants.kMaxSpeedMetersPerSecond, 
-      DriveConstants.kMaxAccelerationMetersPerSecondSquared, 
-      DriveConstants.kMaxAngularSpeed, 
-      DriveConstants.kMaxAngularSpeedRadiansPerSecondSquared);
+      DriveConstants.kMaxSpeedMetersPerSecond*test10,
+      DriveConstants.kMaxAccelerationMetersPerSecondSquared*test10, 
+      DriveConstants.kMaxAngularSpeed*test10, 
+      DriveConstants.kMaxAngularSpeedRadiansPerSecondSquared*test10);
 
     path = new PathPlannerPath(
       waypoints, 
       constraints, 
-      null, 
+      new IdealStartingState(Math.pow(Math.pow(getChassisSpeeds().vxMetersPerSecond,2) + Math.pow(getChassisSpeeds().vyMetersPerSecond,2), 0.5), pose_initial.getRotation()), 
       new GoalEndState(0, pose_final.getRotation()));
     path.preventFlipping = true;
 
@@ -417,13 +446,17 @@ public class DriveSubsystem extends SubsystemBase {
       .positionWrappingEnabled(true)
       .positionWrappingInputRange(0, turningFactor);
     
-    Configs.MAXSwerveModule.drivingConfig.apply(
-      new_driving_config
-    );
-    Configs.MAXSwerveModule.turningConfig.apply(
-      new_turning_config
-    );
+    // Configs.MAXSwerveModule.drivingConfig.apply(
+    //   new_driving_config
+    // );
+    // Configs.MAXSwerveModule.turningConfig.apply(
+    //   new_turning_config
+    // );
 
+    m_frontLeft.changeConfig(new_turning_config, new_driving_config);
+    m_frontRight.changeConfig(new_turning_config, new_driving_config);
+    m_rearLeft.changeConfig(new_turning_config, new_driving_config);
+    m_rearRight.changeConfig(new_turning_config, new_driving_config);
 
   }
 }

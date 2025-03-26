@@ -62,6 +62,7 @@ import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -84,6 +85,7 @@ public class RobotContainer {
   private final AlgaeCollectorSubsystem m_algae_collector_subsystem = new AlgaeCollectorSubsystem();
   @Logged(name = "Pivot")
   private final PivotSubsystem m_pivot_subsystem = new PivotSubsystem();
+  @Logged(name = "Shooter")
   private final ShooterSubsystem m_shooter_subsystem = new ShooterSubsystem();
   
   @Logged(name = "Elevator")
@@ -112,6 +114,7 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    //driveToRight.warmupCommand().schedule();
     // Configure the button bindings
     configureButtonBindings();
 
@@ -123,7 +126,7 @@ public class RobotContainer {
             () -> m_robotDrive.drive(
                 -MathUtil.applyDeadband(Math.pow(m_driverController.getLeftY(),3), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(Math.pow(m_driverController.getLeftX(), 3), OIConstants.kDriveDeadband),
-                MathUtil.applyDeadband(Math.pow(m_driverController.getRightX(),3), OIConstants.kDriveDeadband),
+                -MathUtil.applyDeadband(Math.pow(m_driverController.getRightX(),3), OIConstants.kDriveDeadband),
                 true, ally),
             m_robotDrive));
 
@@ -156,20 +159,24 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-    // new JoystickButton(m_driverController, Button.kCircle.value).toggleOnTrue(
-    //   new driveToLeft(m_robotDrive, m_limelight_subsystem)
-    // );
+    new JoystickButton(m_driverController, Button.kCircle.value).toggleOnTrue(
+      new driveToLeft(m_robotDrive, m_limelight_subsystem)
+    );
 
      new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
       new RunCommand(() -> m_robotDrive.zeroHeading())
      );
 
-    // new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
-    //   new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
+    //  new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
+    //   new resetPID(m_pivot_subsystem, m_elevator_subsystem, m_robotDrive, "Drive")
     // );
-    // new JoystickButton(m_driverController, Button.kCross.value).toggleOnTrue(
-    //   new driveToRight(m_robotDrive, m_limelight_subsystem)
-    //);
+
+    new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
+      new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
+    );
+    new JoystickButton(m_driverController, Button.kCross.value).toggleOnTrue(
+      new driveToRight(m_robotDrive, m_limelight_subsystem)
+    );
 
     // new JoystickButton(m_driverController, Button.kR1.value).whileTrue(
     //   new AlgeaSuck(m_algae_collector_subsystem)
@@ -196,6 +203,12 @@ public class RobotContainer {
     ); // Level 1 RB
     new JoystickButton(m_operator_controller, 6).whileTrue(
       new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 6)
+    );
+    new JoystickButton(m_operator_controller, 7).whileTrue(
+      new AlgaeSuck(m_algae_collector_subsystem)
+    ); // Level 1 RB
+    new JoystickButton(m_operator_controller, 8).whileTrue(
+      new AlgaeShoot(m_algae_collector_subsystem)
     );
     // new JoystickButton(m_operator_controller, 8).whileTrue(
     //   new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 6)
@@ -252,6 +265,6 @@ public class RobotContainer {
     //return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, DriverStation.getAlliance()));
 
     // Run path following command, then stop at the end.
-    return autoChooser.getSelected();
+    return new PathPlannerAuto("AutoTest");
   }
 }

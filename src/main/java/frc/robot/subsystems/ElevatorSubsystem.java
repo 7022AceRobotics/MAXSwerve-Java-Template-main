@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.NeoMotorConstants;
+import frc.robot.Constants.changing_vars;
 
 public class ElevatorSubsystem extends SubsystemBase {
     private SparkMax elevator_motor;
@@ -56,7 +57,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         .p(ElevatorConstants.kP)
         .i(ElevatorConstants.kI)
         .d(ElevatorConstants.kD)
-        .outputRange(-0.25, 0.7)
+        .outputRange(-0.4, 0.9)
         .p(1,ClosedLoopSlot.kSlot1)
           .i(0, ClosedLoopSlot.kSlot1)
           .d(0, ClosedLoopSlot.kSlot1)  
@@ -92,7 +93,13 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public void SetElevatorPosition(double targetposition) {
     m_targetPosition = targetposition;
-    elevator_pidController.setReference(targetposition, ControlType.kPosition);   
+    elevator_pidController.setReference(targetposition, ControlType.kPosition); 
+    if (targetposition == 0.32){
+      changing_vars.speed_multi_change = 0.5;
+    }
+    else if (targetposition == 0.6){
+      changing_vars.speed_multi_change = 0.5;
+    }
     // elevator_pidController.setReference(targetposition, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, 0.1, ArbFFUnits.kPercentOut);
     // elevator_pidController.setReference(0.05, ControlType.kDutyCycle);
     //SmartDashboard.putNumber("AAAAAAAAAAAAAAA", 5); 

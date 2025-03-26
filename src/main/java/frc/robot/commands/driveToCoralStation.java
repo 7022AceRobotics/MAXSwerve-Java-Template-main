@@ -6,6 +6,10 @@ package frc.robot.commands;
 
 import java.util.List;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.PIDController;
@@ -23,6 +27,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PhotonVisionHelper;
 import frc.robot.util.LimelightHelpers;
@@ -34,9 +39,12 @@ public class driveToCoralStation extends Command {
   private PhotonVisionHelper m_photon_vision_subsystem;
   private SwerveControllerCommand swerveControllerCommand;
   private AprilTagFieldLayout map = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+  private PathPlannerPath path;
+  private PathPlannerTrajectory trajectory_to_follow;
   
   private Pose2d pose_final;
   private Pose2d pose_initial;
+  private Pose2d pose_middle;
   public driveToCoralStation(DriveSubsystem m_drive_subsystem, PhotonVisionHelper m_photon_vision_subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_drive_subsystem = m_drive_subsystem;
@@ -51,47 +59,18 @@ public class driveToCoralStation extends Command {
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
     pose_initial = new Pose2d(pose_initial.getX(), pose_initial.getY(), new Rotation2d(pose_initial.getRotation().getRadians() + Math.PI));
     pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1)).transformBy(new Transform2d(DriveConstants.kWheelBase/2, -0.08, new Rotation2d(0))).rotateBy(position_of_apriltag.getRotation());
+    pose_middle = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1)).transformBy(new Transform2d(DriveConstants.kWheelBase/2, -0.5, new Rotation2d(0))).rotateBy(position_of_apriltag.getRotation());
+
     //pose_final = new Pose2d(pose_final.getX(), pose_final.getY(), pose_final.getRotation().times(-1));
     //m_drive_subsystem.reseOdometry(pose_initial);
 
-    TrajectoryConfig config = new TrajectoryConfig(
-        AutoConstants.kMaxSpeedMetersPerSecond,
-        AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-        .setKinematics(DriveConstants.kDriveKinematics);
-    //config.setReversed(true);
+    path = m_drive_subsystem.getPathTo(pose_initial, pose_final, pose_middle);
 
-    // List.of(new Translation2d(
-    //       Math.min(pose_initial.getX(), pose_final.getX()) + Math.abs(pose_initial.getX() - pose_final.getX())/3, 
-    //       Math.min(pose_initial.getY(), pose_final.getY()) + Math.abs(pose_initial.getY() - pose_final.getY())/3),
-    //       new Translation2d(
-    //       (pose_initial.getX() + pose_final.getX())/2, 
-    //       (pose_initial.getY() + pose_final.getY())/2))
-
-
-    Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-        pose_initial,
-        List.of(),
-        pose_final,
-        config);
-
-    var thetaController = new ProfiledPIDController(
-        AutoConstants.kPThetaController, 0, AutoConstants.kIThetaController, AutoConstants.kThetaControllerConstraints);
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-
-    m_drive_subsystem.resetOdometry(exampleTrajectory.getInitialPose());
-
-    swerveControllerCommand = new SwerveControllerCommand(
-        exampleTrajectory,
-        m_drive_subsystem::getPose,
-        DriveConstants.kDriveKinematics,
-
-        new PIDController(AutoConstants.kPXController, 0, AutoConstants.kIXController),
-        new PIDController(AutoConstants.kPYController, 0, AutoConstants.kIYController),
-        thetaController,
-        m_drive_subsystem::setModuleStates,
-        m_drive_subsystem);
-
-    swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
+    trajectory_to_follow = path.generateTrajectory(m_drive_subsystem.getChassisSpeeds(), pose_initial.getRotation(), PathPlannerConstants.robot);
+    if (trajectory_to_follow.getTotalTimeSeconds() < 20){
+      AutoBuilder.followPath(path).andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
+    }
+    
 
     SmartDashboard.putNumber("X1: ", pose_initial.getX());
     SmartDashboard.putNumber("Y1: ", pose_initial.getY());

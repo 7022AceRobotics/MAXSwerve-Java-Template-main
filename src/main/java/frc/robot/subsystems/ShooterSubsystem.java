@@ -11,6 +11,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -20,11 +21,12 @@ public class ShooterSubsystem extends SubsystemBase {
   private final SparkMax m_shooting_motor;
   private final AnalogPotentiometer m_sensor;
   private final SparkMaxConfig m_config;
-  private double sensor_values = 0;
+  private double sensor_average = 0;
+  private double sensor_iters = 0;
     
     public ShooterSubsystem() {
       m_shooting_motor = new SparkMax(11, MotorType.kBrushless);
-      m_sensor  = new AnalogPotentiometer(1);
+      m_sensor  = new AnalogPotentiometer(0);
       m_config = new SparkMaxConfig();
   
       m_config.smartCurrentLimit(20);
@@ -35,18 +37,31 @@ public class ShooterSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
       // This method will be called once per scheduler ru
+      SmartDashboard.putNumber("Get sensor val",m_sensor.get());
     }
   
     public void shoot(double speed){
-      // if (!(sensor_values > 0.4 && m_sensor.get() < 0.2)){
+      sensor_iters += 1;
+      sensor_average += m_shooting_motor.getBusVoltage();
+      if (m_shooting_motor.getBusVoltage() >= sensor_average/sensor_iters - 0.75){
         m_shooting_motor.set(-speed);
-        // sensor_values = m_sensor.get();
-    //}
+    }
       }
     
   
 
   public void stop(){
     m_shooting_motor.set(0);
+    sensor_iters = 0;
+      sensor_average = 0;
+  }
+
+  @Logged(name="current")
+  public double getCurrent(){
+    return m_shooting_motor.getOutputCurrent();
+  }
+  @Logged(name="voltage")
+  public double getVoltage(){
+    return m_shooting_motor.getBusVoltage();
   }
 }

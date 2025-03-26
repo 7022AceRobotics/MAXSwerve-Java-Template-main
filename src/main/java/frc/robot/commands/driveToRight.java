@@ -10,10 +10,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -23,9 +26,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.ExponentialProfile.Constraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,10 +61,14 @@ public class driveToRight extends Command {
   
   private double id_dub;
   private Pose2d pose_final;
+  private Pose2d pose_middle;
   private Pose2d pose_initial;
 
   private List<Waypoint> waypoints;
   private PathPlannerPath path;
+  private PathPlannerTrajectory trajectory_to_follow;
+  private PathConstraints constraints_auto;
+  private PPHolonomicDriveController test;
   
   //AprilTagFieldLayout map = new AprilTagFieldLayout((Path) AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark));
   //private Path file_path = FileSystem.getDeployDirectory().toPath().resolve(path_to_map);
@@ -73,14 +83,21 @@ public class driveToRight extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    System.out.print("AAAA");
     id_dub = LimelightHelpers.getFiducialID("limelight");
     if (id_dub != -1){
     int id = (int) id_dub;  
     Pose2d position_of_apriltag = map.getTagPose(id).get().toPose2d();
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
 
+    pose_middle = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
+    .transformBy(new Transform2d(DriveConstants.kWheelBase/2 + 0.1, -0.6, new Rotation2d(0)))
+    .rotateBy(position_of_apriltag.getRotation())
+    .rotateBy(new Rotation2d(Math.PI))
+    .times(-1);
+
     pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
-    .transformBy(new Transform2d(DriveConstants.kWheelBase/2, -0.05, new Rotation2d(0)))
+    .transformBy(new Transform2d(DriveConstants.kWheelBase/2 + Units.inchesToMeters(7), 0.3, new Rotation2d(0)))
     .rotateBy(position_of_apriltag.getRotation())
     .rotateBy(new Rotation2d(Math.PI))
     .times(-1);
@@ -89,19 +106,35 @@ public class driveToRight extends Command {
       pose_final = new Pose2d(pose_final.getX(), pose_final.getY(), pose_final.getRotation().times(-1));
     }
 
-    path = m_drive_subsystem.getPathTo(pose_initial, pose_final);
+    path = m_drive_subsystem.getPathTo(pose_initial, pose_final, pose_middle);
 
-    swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
-
+    trajectory_to_follow = path.generateTrajectory(m_drive_subsystem.getChassisSpeeds(), pose_initial.getRotation(), PathPlannerConstants.robot);
+    SmartDashboard.putNumber("TIME TRA", trajectory_to_follow.getTotalTimeSeconds());
+    if (trajectory_to_follow.getTotalTimeSeconds() < 10){
+      //test = new PPHolonomicDriveController(new PIDConstants(5, 0, 0), new PIDConstants(2.5, 0, 0));
+      AutoBuilder.followPath(path).andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
+      //swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
     }
+
+    SmartDashboard.putNumber("X1: ", pose_initial.getX());
+    SmartDashboard.putNumber("Y1: ", pose_initial.getY());
+
+    SmartDashboard.putNumber("X2: ", pose_final.getX());
+    SmartDashboard.putNumber("Y2: ", pose_final.getY());
+
+    SmartDashboard.putNumber("R: ", pose_initial.getRotation().getDegrees());
+    SmartDashboard.putNumber("R2: ", pose_final.getRotation().getDegrees());
   }
+    
+  }
+
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    if (id_dub != -1){
-    swerveControllerCommand.end(interrupted);
-    }
+    // if (id_dub != -1){
+    // swerveControllerCommand.end(interrupted);
+    // }
   }
 
   // Returns true when the command should end.
