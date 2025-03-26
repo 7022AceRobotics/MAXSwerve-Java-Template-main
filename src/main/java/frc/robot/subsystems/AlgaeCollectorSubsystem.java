@@ -53,7 +53,7 @@ public class AlgaeCollectorSubsystem extends SubsystemBase {
         .maxAcceleration(AlgaeConstants.kMaxAccel)
         .allowedClosedLoopError(AlgaeConstants.kAllowedErr);
 
-    m_pivot_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    m_pivot_motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
     m_encoder.setPosition(0);
     

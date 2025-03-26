@@ -167,16 +167,16 @@ public final class Constants {
   public class AlgaeConstants {
     public static final int kAlgaePivotMotorPort = 13;
     public static final int kAlgaePullMotorPort = 14;
-    public static final int kAlgaeLightSensorPort = 5;
-    public static final double kP = 0;
+    public static final int kAlgaeLightSensorPort = 1;
+    public static final double kP = 1;
     public static final double kI = 0;
     public static final double kD = 0;
     public static final double kIz = 0;
     public static final double kFF = 0;
-    public static final double kMaxOutput = 0;
-    public static final double kMinOutput = 0;
-    public static final double kMaxVel = 0;
-    public static final double kMaxAccel = 0;
+    public static final double kMaxOutput = 0.25;
+    public static final double kMinOutput = -0.25;
+    public static final double kMaxVel = 500;
+    public static final double kMaxAccel = 100;
     public static final double kAllowedErr = 0;
     //Elevator Positions has to be positive
     public static final double kOutPosistion = 31.4;
