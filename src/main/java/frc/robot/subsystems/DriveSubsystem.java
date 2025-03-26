@@ -8,6 +8,7 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,7 @@ import frc.robot.Constants.MicrosoftCameraConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.Constants.changing_vars;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -400,6 +402,31 @@ public class DriveSubsystem extends SubsystemBase {
     resetOdometry(pose_initial);
 
     return path;
+  }
+
+  public Command getPathFinderPath(Pose2d pose_initial, Pose2d pose_middle, Pose2d pose_final){
+    PathConstraints path_constraints = new PathConstraints(
+    DriveConstants.kMaxSpeedMetersPerSecond, 
+    DriveConstants.kMaxAccelerationMetersPerSecondSquared, 
+    DriveConstants.kMaxAngularSpeed, 
+    DriveConstants.kMaxAngularSpeedRadiansPerSecondSquared);
+
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+      new Pose2d(pose_initial.getX(), pose_initial.getY(), new Rotation2d(0)),
+      //new Pose2d(pose_middle.getX(), pose_middle.getY(), new Rotation2d(0)),
+      new Pose2d(pose_final.getX(), pose_final.getY(), new Rotation2d(0))
+    );
+
+    PathPlannerPath path = new PathPlannerPath(
+      waypoints, 
+      path_constraints, 
+      null, 
+      new GoalEndState(0, pose_final.getRotation()));
+    
+    return AutoBuilder.pathfindThenFollowPath(path, path_constraints);
+
+
+    
   }
 
   public void resetPID(){
