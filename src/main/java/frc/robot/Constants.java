@@ -100,7 +100,7 @@ public final class Constants {
 
     // Calculations required for driving motor conversion factors and feed forward
     public static final double kDrivingMotorFreeSpeedRps = NeoMotorConstants.kFreeSpeedRpm / 60;
-    public static final double kWheelDiameterMeters = Units.inchesToMeters(3);
+    public static final double kWheelDiameterMeters = Units.inchesToMeters(2.92);
     public static final double kWheelCircumferenceMeters = kWheelDiameterMeters * Math.PI;
     // 45 teeth on the wheel's bevel gear, 22 teeth on the first-stage spur gear, 15
     // teeth on the bevel pinion
@@ -199,12 +199,12 @@ public final class Constants {
     public static final double kMaxAccel = 2500;
     public static final double kAllowedErr = 0.05;
     //Pivot Positions has to be positive
-    public static final double kL0 = 0.04;
+    public static final double kL0 = 0;
     public static final double kL1 = 0; // measured in degrees 87.04
     public static final double kL2 = 35;
     public static final double kL3 = 35;
-    public static final double kL4 = 35; //92.95
-    public static final double kLI = 25;// 74 before encoder
+    public static final double kL4 = 39; //92.95
+    public static final double kLI = 23;// 74 before encoder
     public static final double kM = 20;
 
     public static final double kGearRatio = 135;

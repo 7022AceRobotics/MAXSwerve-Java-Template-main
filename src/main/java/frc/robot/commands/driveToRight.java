@@ -42,6 +42,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.PhotonVisionHelper;
+import frc.robot.subsystems.RudolphTheReindeer;
 import frc.robot.util.LimelightHelpers;
 
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -55,6 +56,7 @@ public class driveToRight extends Command {
   /** Creates a new driveToLeft. */
   private DriveSubsystem m_drive_subsystem;
   private LimelightHelpers m_limelight_subsystem;
+  private RudolphTheReindeer m_led_subsystem;
   private Command swerveControllerCommand;
   private AprilTagFieldLayout map = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   
@@ -74,10 +76,11 @@ public class driveToRight extends Command {
   //private Path file_path = FileSystem.getDeployDirectory().toPath().resolve(path_to_map);
 
   
-  public driveToRight(DriveSubsystem m_drive_subsystem, LimelightHelpers m_photon_vision_subsystem) {
+  public driveToRight(DriveSubsystem m_drive_subsystem, LimelightHelpers m_photon_vision_subsystem, RudolphTheReindeer m_led_subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_limelight_subsystem = m_photon_vision_subsystem;
     this.m_drive_subsystem = m_drive_subsystem;
+    this.m_led_subsystem = m_led_subsystem;
   }
 
   // Called when the command is initially scheduled.
@@ -86,18 +89,19 @@ public class driveToRight extends Command {
     System.out.print("AAAA");
     id_dub = LimelightHelpers.getFiducialID("limelight");
     if (id_dub != -1){
+    m_led_subsystem.setBlueBlink();
     int id = (int) id_dub;  
     Pose2d position_of_apriltag = map.getTagPose(id).get().toPose2d();
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
 
     pose_middle = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
-    .transformBy(new Transform2d(DriveConstants.kWheelBase/2 + 0.1, -0.6, new Rotation2d(0)))
+    .transformBy(new Transform2d(DriveConstants.kWheelBase/2 + 0.1, -0.35, new Rotation2d(0)))
     .rotateBy(position_of_apriltag.getRotation())
     .rotateBy(new Rotation2d(Math.PI))
     .times(-1);
 
     pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
-    .transformBy(new Transform2d(DriveConstants.kWheelBase/2 + Units.inchesToMeters(7), 0.3, new Rotation2d(0)))
+    .transformBy(new Transform2d(DriveConstants.kWheelBase/2 + Units.inchesToMeters(4), 0.2, new Rotation2d(0)))
     .rotateBy(position_of_apriltag.getRotation())
     .rotateBy(new Rotation2d(Math.PI))
     .times(-1);
@@ -111,9 +115,13 @@ public class driveToRight extends Command {
     trajectory_to_follow = path.generateTrajectory(m_drive_subsystem.getChassisSpeeds(), pose_initial.getRotation(), PathPlannerConstants.robot);
     SmartDashboard.putNumber("TIME TRA", trajectory_to_follow.getTotalTimeSeconds());
     if (trajectory_to_follow.getTotalTimeSeconds() < 10){
+      m_led_subsystem.setGreen();
       //test = new PPHolonomicDriveController(new PIDConstants(5, 0, 0), new PIDConstants(2.5, 0, 0));
       AutoBuilder.followPath(path).andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
       //swerveControllerCommand.andThen(() -> m_drive_subsystem.drive(0, 0, 0, false, DriverStation.getAlliance())).schedule();
+    }
+    else{
+      m_led_subsystem.setRed();
     }
 
     SmartDashboard.putNumber("X1: ", pose_initial.getX());

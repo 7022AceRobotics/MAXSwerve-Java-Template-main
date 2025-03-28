@@ -52,12 +52,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     // elevator_pidController.setReference(0, SparkBase.ControlType.kMAXMotionPositionControl);    
 
     // config.closedLoopRampRate(0.05);
-    config.smartCurrentLimit(50);
+    config.smartCurrentLimit(40, 5700, 4000);
     config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(ElevatorConstants.kP)
         .i(ElevatorConstants.kI)
         .d(ElevatorConstants.kD)
-        .outputRange(-0.4, 0.9)
+        .outputRange(-0.4, 0.8)
         .p(1,ClosedLoopSlot.kSlot1)
           .i(0, ClosedLoopSlot.kSlot1)
           .d(0, ClosedLoopSlot.kSlot1)  
@@ -68,7 +68,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         .allowedClosedLoopError(ElevatorConstants.allowedErr);
     //elevator_pidController.setReference(0, SparkBase.ControlType.kMAXMotionPositionControl);    
     
-    elevator_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    elevator_motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     elevator_encoder.setPosition(0);
   }

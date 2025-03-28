@@ -3,45 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.3527499999999995,
-        "y": 5.28275
+        "x": 5.394467213114754,
+        "y": 2.6883709016393436
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.3527499999999995,
-        "y": 5.28275
+        "x": 5.262602459016393,
+        "y": 2.076997950819672
       },
       "isLocked": false,
-      "linkedName": "from coral left number 1"
+      "linkedName": "Right auto"
     },
     {
       "anchor": {
-        "x": 3.841500000004099,
-        "y": 6.862249999999906
+        "x": 3.752151639344262,
+        "y": 1.8132684426229502
       },
       "prevControl": {
-        "x": 5.279937500003071,
-        "y": 6.31624999999993
+        "x": 5.235143442622952,
+        "y": 2.2747950819672123
       },
       "nextControl": {
-        "x": 2.403062500005124,
-        "y": 7.4082499999998825
+        "x": 2.2691598360655734,
+        "y": 1.3517418032786879
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.589250000004099,
-        "y": 7.398499999999906
+        "x": 1.282684426229508,
+        "y": 0.842264344262295
       },
       "prevControl": {
-        "x": 2.1352500000040986,
-        "y": 6.452749999999906
+        "x": 2.0858606557377044,
+        "y": 1.9091700819672122
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Coral station right"
     }
   ],
   "rotationTargets": [],
@@ -58,13 +58,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -0.0
+    "rotation": -35.0
   },
   "reversed": false,
-  "folder": null,
+  "folder": "Right Auto paths",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 59.99999999999999
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }

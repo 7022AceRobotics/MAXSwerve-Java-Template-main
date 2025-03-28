@@ -15,11 +15,13 @@ public class suck extends Command {
   private final ShooterSubsystem m_shooting_subsystem;
   private final Supplier<Double> m_axis;
   private final Supplier<Double> m_axis2;
-  public suck(ShooterSubsystem m_shooting_subsystem, Supplier<Double> m_axis, Supplier<Double> m_axis2) {
+  private final String mode;
+  public suck(ShooterSubsystem m_shooting_subsystem, Supplier<Double> m_axis, Supplier<Double> m_axis2, String mode) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_shooting_subsystem = m_shooting_subsystem;
     this.m_axis = m_axis;
     this.m_axis2 = m_axis2;
+    this.mode = mode;
 
     addRequirements(m_shooting_subsystem);
   }
@@ -31,14 +33,19 @@ public class suck extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (m_axis.get() > 0.05){
-    m_shooting_subsystem.shoot(Math.max(Math.pow(m_axis.get(),3), 0.5));
+    if (mode == "Teleop"){
+      if (m_axis.get() > 0.05){
+      m_shooting_subsystem.shoot(Math.max(Math.pow(m_axis.get(),3), 1));
+      }
+      else if (m_axis2.get() > 0.05){
+        m_shooting_subsystem.shoot(Math.max(-m_axis2.get(), -1));
+      }
+      else{
+        m_shooting_subsystem.stop();
+      }
     }
-    else if (m_axis2.get() > 0.05){
-      m_shooting_subsystem.shoot(Math.max(-m_axis2.get(), -0.5));
-    }
-    else{
-      m_shooting_subsystem.stop();
+    else if (mode == "Auto"){
+      m_shooting_subsystem.shoot(-1);
     }
   }
 

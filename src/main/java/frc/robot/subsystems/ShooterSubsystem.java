@@ -29,9 +29,9 @@ public class ShooterSubsystem extends SubsystemBase {
       m_sensor  = new AnalogPotentiometer(0);
       m_config = new SparkMaxConfig();
   
-      m_config.smartCurrentLimit(20);
+      m_config.smartCurrentLimit(20, 1000, 500);
   
-      m_shooting_motor.configure(m_config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+      m_shooting_motor.configure(m_config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
   
     @Override
@@ -63,5 +63,9 @@ public class ShooterSubsystem extends SubsystemBase {
   @Logged(name="voltage")
   public double getVoltage(){
     return m_shooting_motor.getBusVoltage();
+  }
+  @Logged(name="velo")
+  public double getVelocity(){
+    return m_shooting_motor.getEncoder().getVelocity();
   }
 }

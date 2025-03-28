@@ -47,7 +47,8 @@ public class PivotSubsystem extends SubsystemBase {
       this.m_encoder = m_pivot_motor.getEncoder();
       this.m_config = new SparkMaxConfig();
 
-      m_config.smartCurrentLimit(20);
+      //m_config.smartCurrentLimit(20);
+      m_config.smartCurrentLimit(40, 5700, 4000);
   
       m_config.closedLoop.feedbackSensor(FeedbackSensor.kPrimaryEncoder)
           .p(PivotConstants.kP)
@@ -57,7 +58,7 @@ public class PivotSubsystem extends SubsystemBase {
           .p(1, ClosedLoopSlot.kSlot1)
           .i(0, ClosedLoopSlot.kSlot1)
           .d(0, ClosedLoopSlot.kSlot1)
-          .velocityFF(0, ClosedLoopSlot.kSlot1);
+          .velocityFF(1.4, ClosedLoopSlot.kSlot1);
       m_config.closedLoop.maxMotion
           .maxVelocity(PivotConstants.kMaxVel)
           .maxAcceleration(PivotConstants.kMaxAccel)

@@ -24,6 +24,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,6 +34,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.PathPlannerConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.RudolphTheReindeer;
 import frc.robot.util.LimelightHelpers;
 
 import frc.robot.Constants.DriveConstants;
@@ -43,6 +45,7 @@ public class driveToLeft extends InstantCommand {
   private DriveSubsystem m_drive_subsystem;
   private LimelightHelpers m_limelight_subsystem;
   private SwerveControllerCommand swerveControllerCommand;
+  private RudolphTheReindeer m_led_subsystem;
   private AprilTagFieldLayout map = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
   
   
@@ -57,9 +60,10 @@ public class driveToLeft extends InstantCommand {
   //private Path file_path = FileSystem.getDeployDirectory().toPath().resolve(path_to_map);
 
   
-  public driveToLeft(DriveSubsystem m_drive_subsystem, LimelightHelpers m_limelight_subsystem) {
+  public driveToLeft(DriveSubsystem m_drive_subsystem, LimelightHelpers m_limelight_subsystem, RudolphTheReindeer m_led_subsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.m_limelight_subsystem = m_limelight_subsystem;
+    this.m_led_subsystem = m_led_subsystem;
     this.m_drive_subsystem = m_drive_subsystem;
   }
 
@@ -68,12 +72,13 @@ public class driveToLeft extends InstantCommand {
   public void initialize() {
     id_dub = LimelightHelpers.getFiducialID("limelight");
     if (id_dub != -1){
+    m_led_subsystem.setBlueBlink();
     int id = (int) id_dub;  
     Pose2d position_of_apriltag = map.getTagPose(id).get().toPose2d();
     pose_initial = m_drive_subsystem.m_swerve_drive_pose_estimator.getEstimatedPosition();
 
     pose_final = position_of_apriltag.rotateBy(position_of_apriltag.getRotation().times(-1))
-    .transformBy(new Transform2d(DriveConstants.kWheelBase/2, 0, new Rotation2d(0))).
+    .transformBy(new Transform2d(DriveConstants.kWheelBase/2 + Units.inchesToMeters(5), -0.2, new Rotation2d(0))).
     rotateBy(position_of_apriltag.getRotation()).rotateBy(new Rotation2d(3.14159)).times(-1);
     
     SmartDashboard.putNumber("P", position_of_apriltag.getRotation().getDegrees());

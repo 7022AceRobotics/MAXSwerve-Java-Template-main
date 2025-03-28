@@ -17,6 +17,7 @@ import org.photonvision.PhotonPoseEstimator;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.ConstraintsZone;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
@@ -126,15 +127,15 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
-
+    zeroHeadingThread().start();
     AutoBuilder.configure(
             this::getPose, // Robot pose supplier
             this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
             this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(3, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(2, 0.0, 0.0) // Rotation PID constants
+                    new PIDConstants(5, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(5, 0.0, 0.0) // Rotation PID constants
             ),
             PathPlannerConstants.robot, // The robot configuration
             () -> {
@@ -303,6 +304,11 @@ public class DriveSubsystem extends SubsystemBase {
     m_gyro.setGyroAngleZ(180);
   }
 
+  public void startHeading() {
+    m_gyro.reset();
+    m_gyro.setGyroAngleZ(-45);
+  }
+
   /**
    * Returns the heading of the robot.
    *
@@ -368,30 +374,58 @@ public class DriveSubsystem extends SubsystemBase {
         .setKinematics(DriveConstants.kDriveKinematics);
     //config.setReversed(true);
 
+    // waypoints = PathPlannerPath.waypointsFromPoses(
+    //   new Pose2d(pose_initial.getX(), pose_initial.getY(), new Rotation2d(0)),
+    //   //new Pose2d(pose_middle.getX(), pose_middle.getY(), new Rotation2d(0)),
+    //   new Pose2d(pose_final.getX(), pose_final.getY(), new Rotation2d(0))
+    // );
+
     waypoints = PathPlannerPath.waypointsFromPoses(
-      new Pose2d(pose_initial.getX(), pose_initial.getY(), new Rotation2d(0)),
+      pose_initial,
       //new Pose2d(pose_middle.getX(), pose_middle.getY(), new Rotation2d(0)),
-      new Pose2d(pose_final.getX(), pose_final.getY(), new Rotation2d(0))
-    );
+      pose_final
+      );
+
+    List<ConstraintsZone> constraint_zones = List.of(new ConstraintsZone(
+      0.65, 
+      1, 
+      new PathConstraints(
+        DriveConstants.kMaxSpeedMetersPerSecond*0.5, 
+        DriveConstants.kMaxAccelerationMetersPerSecondSquared*0.5, 
+        DriveConstants.kMaxAngularSpeed*0.5, 
+        DriveConstants.kMaxAngularSpeedRadiansPerSecondSquared*0.5)));
 
     // waypoints = PathPlannerPath.waypointsFromPoses(
     //   pose_initial,
     //   pose_middle,
     //   pose_final
     // );
-    var test10 = 0.75;
+    var test10 = 1;
     PathConstraints constraints = new PathConstraints(
       DriveConstants.kMaxSpeedMetersPerSecond*test10,
       DriveConstants.kMaxAccelerationMetersPerSecondSquared*test10, 
       DriveConstants.kMaxAngularSpeed*test10, 
       DriveConstants.kMaxAngularSpeedRadiansPerSecondSquared*test10);
 
+    // path = new PathPlannerPath(
+    //   waypoints, 
+    //   constraints, 
+    //   new IdealStartingState(Math.pow(Math.pow(getChassisSpeeds().vxMetersPerSecond,2) + Math.pow(getChassisSpeeds().vyMetersPerSecond,2), 0.5), pose_initial.getRotation()), 
+    //   new GoalEndState(0, pose_final.getRotation()));
+    // path.preventFlipping = true;
+
     path = new PathPlannerPath(
       waypoints, 
-      constraints, 
-      new IdealStartingState(Math.pow(Math.pow(getChassisSpeeds().vxMetersPerSecond,2) + Math.pow(getChassisSpeeds().vyMetersPerSecond,2), 0.5), pose_initial.getRotation()), 
-      new GoalEndState(0, pose_final.getRotation()));
-    path.preventFlipping = true;
+      List.of(), 
+      List.of(),
+       constraint_zones, 
+       List.of(), 
+       constraints, 
+       new IdealStartingState(Math.pow(Math.pow(getChassisSpeeds().vxMetersPerSecond,2) + Math.pow(getChassisSpeeds().vyMetersPerSecond,2), 0.5), pose_initial.getRotation()), 
+       new GoalEndState(0, pose_final.getRotation()), 
+       false);
+
+      path.preventFlipping = true;
 
 
     // VERY LIKELY TO BE EXCESSIVE. DEPRECATE POTENTIALLY
@@ -416,6 +450,15 @@ public class DriveSubsystem extends SubsystemBase {
       //new Pose2d(pose_middle.getX(), pose_middle.getY(), new Rotation2d(0)),
       new Pose2d(pose_final.getX(), pose_final.getY(), new Rotation2d(0))
     );
+
+    List<ConstraintsZone> constraint_zones = List.of(new ConstraintsZone(
+      0.65, 
+      1, 
+      new PathConstraints(
+        DriveConstants.kMaxSpeedMetersPerSecond, 
+        DriveConstants.kMaxAccelerationMetersPerSecondSquared, 
+        DriveConstants.kMaxAngularSpeed, 
+        DriveConstants.kMaxAngularSpeedRadiansPerSecondSquared)));
 
     PathPlannerPath path = new PathPlannerPath(
       waypoints, 
@@ -486,4 +529,17 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.changeConfig(new_turning_config, new_driving_config);
 
   }
+
+
+public Thread zeroHeadingThread(){
+  Thread zThread = new Thread(() -> {
+    try {
+      Thread.sleep(1000);
+      startHeading();
+    }catch (Exception e) {
+    }
+  });
+  return zThread;
+}
+
 }

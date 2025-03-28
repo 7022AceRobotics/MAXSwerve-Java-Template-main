@@ -31,7 +31,7 @@ public class score2 extends SequentialCommandGroup {
   private double m_pivot_position;
       
 
-		public score2(ElevatorSubsystem m_elevator_subsystem, PivotSubsystem m_pivot_subsystem, DriveSubsystem m_drive_subsystem, ShooterSubsystem m_shooting_subsystem, int m_position) {
+		public score2(ElevatorSubsystem m_elevator_subsystem, PivotSubsystem m_pivot_subsystem, ShooterSubsystem m_shooting_subsystem, int m_position) {
           // Use addRequirements() here to declare subsystem dependencies.
           // this.m_elevator_subsystem = m_elevator_subsystem;
           // this.m_pivot_subsystem = m_pivot_subsystem;
@@ -74,8 +74,8 @@ public class score2 extends SequentialCommandGroup {
           }
           
           addCommands(
-            new SequentialCommandGroup(
-            new moveElevatorTo(m_elevator_subsystem, m_elevator_position, m_shooting_subsystem),
-            new pivotTo(m_pivot_subsystem, m_pivot_position)));
-      }
+            new SequentialCommandGroup(new pivotTo(m_pivot_subsystem, m_pivot_position)),
+            new moveElevatorTo(m_elevator_subsystem, m_elevator_position, m_shooting_subsystem)
+         );
     }
+  }

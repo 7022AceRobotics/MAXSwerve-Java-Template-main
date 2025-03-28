@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.PivotConstants;
 import frc.robot.commands.AlgaeShoot;
 import frc.robot.commands.AlgaeSuck;
 import frc.robot.commands.driveToCoralStation;
@@ -63,6 +64,7 @@ import java.util.Optional;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.events.EventTrigger;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -132,7 +134,9 @@ public class RobotContainer {
 
     m_limelight_subsystem2.setDefaultCommand(new limelight(m_limelight_subsystem2, m_robotDrive));
 
-    m_shooter_subsystem.setDefaultCommand(new suck(m_shooter_subsystem, ()->m_operator_controller.getRawAxis(2), ()->m_operator_controller.getRawAxis(3)));
+    m_shooter_subsystem.setDefaultCommand(new suck(m_shooter_subsystem, ()->m_operator_controller.getRawAxis(2), ()->m_operator_controller.getRawAxis(3), "Teleop"));
+
+    m_led_subsystem.setDefaultCommand(new RunCommand(() -> m_led_subsystem.setBennies(), m_led_subsystem));
     //m_shooter_subsystem.setDefaultCommand(new suck(m_shooter_subsystem));
 
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -141,7 +145,7 @@ public class RobotContainer {
 
     DataLogManager.start();
 
-    //NamedCommands.registerCommand("L1", new suck(m_shooter_subsystem, m_operator_controller.getRawAxis(2), m_operator_controller.getRawAxis(3)).withTimeout(10));
+    initialize_auto_markers();
   }
 
   /**
@@ -160,7 +164,7 @@ public class RobotContainer {
             m_robotDrive));
 
     new JoystickButton(m_driverController, Button.kCircle.value).toggleOnTrue(
-      new driveToLeft(m_robotDrive, m_limelight_subsystem)
+      new driveToLeft(m_robotDrive, m_limelight_subsystem, m_led_subsystem)
     );
 
      new JoystickButton(m_driverController, Button.kTriangle.value).whileTrue(
@@ -172,10 +176,10 @@ public class RobotContainer {
     // );
 
     new JoystickButton(m_driverController, Button.kSquare.value).toggleOnTrue(
-      new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem)
+      new driveToCoralStation(m_robotDrive, m_photon_vision_subsystem, m_led_subsystem)
     );
     new JoystickButton(m_driverController, Button.kCross.value).toggleOnTrue(
-      new driveToRight(m_robotDrive, m_limelight_subsystem)
+      new driveToRight(m_robotDrive, m_limelight_subsystem, m_led_subsystem)
     );
 
     // new JoystickButton(m_driverController, Button.kR1.value).whileTrue(
@@ -187,22 +191,22 @@ public class RobotContainer {
     // ); 
 
     new JoystickButton(m_operator_controller, 3).whileTrue(
-      new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 1)
+      new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 1)
     ); // smartdashboard Start
     new JoystickButton(m_operator_controller, 1).whileTrue(
-      new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 2)
+      new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 2)
      ); // Level 2 Back
     new JoystickButton(m_operator_controller, 2).whileTrue(
-      new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 3)
+      new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 3)
     ); // Level 3 Y
     new JoystickButton(m_operator_controller, 4).whileTrue(
-      new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 4)
+      new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 4)
     ); // Level 4 LB
     new JoystickButton(m_operator_controller, 5).whileTrue(
-      new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 5)
+      new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 5)
     ); // Level 1 RB
     new JoystickButton(m_operator_controller, 6).whileTrue(
-      new score2(m_elevator_subsystem, m_pivot_subsystem,m_robotDrive,m_shooter_subsystem, 6)
+      new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 6)
     );
     new JoystickButton(m_operator_controller, 7).whileTrue(
       new AlgaeSuck(m_algae_collector_subsystem)
@@ -219,6 +223,18 @@ public class RobotContainer {
 
   }
 
+  private void initialize_auto_markers(){
+    NamedCommands.registerCommand("shoot", new suck(m_shooter_subsystem, ()->m_driverController.getRawAxis(2), ()->m_operator_controller.getRawAxis(2), "Auto").withTimeout(1.5));
+    NamedCommands.registerCommand("L0", new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 0));
+    NamedCommands.registerCommand("Pivot4",new pivotTo(m_pivot_subsystem, PivotConstants.kL4));
+
+
+    new EventTrigger("shootE").whileTrue(new suck(m_shooter_subsystem, ()->m_driverController.getRawAxis(2), ()->m_operator_controller.getRawAxis(2), "Auto"));
+    new EventTrigger("L4E").whileTrue(new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 4));
+    new EventTrigger("L5E").whileTrue(new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 5));
+    new EventTrigger("L0E").whileTrue(new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 0));
+
+  }
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -265,6 +281,6 @@ public class RobotContainer {
     //return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, DriverStation.getAlliance()));
 
     // Run path following command, then stop at the end.
-    return new PathPlannerAuto("AutoTest");
+    return new PathPlannerAuto("Auto2");
   }
 }
