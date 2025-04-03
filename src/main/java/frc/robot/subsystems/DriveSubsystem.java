@@ -127,6 +127,7 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+    startHeading();
     zeroHeadingThread().start();
     AutoBuilder.configure(
             this::getPose, // Robot pose supplier
@@ -177,7 +178,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     updateSwerveDrive(Rotation2d.fromDegrees(m_gyro.getAngle(IMUAxis.kZ)), getSwerveModulePositions());
 
-    //SmartDashboard.putNumber("Setpoint", swerve;
+    SmartDashboard.putNumber("rotation3",m_gyro.getAngle());
   }
 
   /**
@@ -226,10 +227,11 @@ public class DriveSubsystem extends SubsystemBase {
     // xSpeedDelivered = filter.calculate(xSpeedDelivered);
     // ySpeedDelivered = filter.calculate(ySpeedDelivered);
     //rotDelivered = filter.calculate(rotDelivered);
-
-    if (ally.get() == Alliance.Red){
-      m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) + 180);
-    }
+    // if (ally.isPresent()){
+    // if (ally.get() == Alliance.Blue){
+    //   m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) - 180);
+    // }
+  //}
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
       ChassisSpeeds.discretize(fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
@@ -244,10 +246,11 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(swerveModuleStates[2]);
     m_rearRight.setDesiredState(swerveModuleStates[3]);
 
-    if (ally.get() == Alliance.Red){
-      m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) - 180);
-    }
-
+  //   if (ally.isPresent()){
+  //   if (ally.get() == Alliance.Blue){
+  //     m_gyro.setGyroAngleZ(m_gyro.getAngle(IMUAxis.kZ) + 180);
+  //   }
+  // }
 
     SmartDashboard.putNumber("Theo", swerveModuleStates[0].speedMetersPerSecond);
     SmartDashboard.putNumber("Act", m_frontLeft.getState().speedMetersPerSecond);
@@ -301,12 +304,12 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.reset();
-    m_gyro.setGyroAngleZ(180);
+    //m_gyro.setGyroAngleZ(180);
   }
 
   public void startHeading() {
     m_gyro.reset();
-    m_gyro.setGyroAngleZ(-45);
+    m_gyro.setGyroAngleZ(225);
   }
 
   /**
@@ -352,6 +355,10 @@ public class DriveSubsystem extends SubsystemBase {
   public ChassisSpeeds getChassisSpeeds(){
     return DriveConstants.kDriveKinematics.toChassisSpeeds(getSwerveModuleStateCus());
   }
+  @Logged(name="voltageSwerve1")
+  public double getVoltage(){
+    return m_frontLeft.getDriveVoltage();
+  }
 
   @Logged(name="swerve_positions")
   public SwerveModuleState[] getSwerveModuleStateCus(){
@@ -361,6 +368,11 @@ public class DriveSubsystem extends SubsystemBase {
     states[2] = m_rearLeft.getState();
     states[3] = m_rearRight.getState();
     return states;
+  }
+
+  @Logged(name="targetted_swerve")
+  public ChassisSpeeds getTargetedSwerve(){
+    return new ChassisSpeeds(xSpeedDelivered * DriveConstants.kMaxSpeedMetersPerSecond * changing_vars.speed_multi_change, ySpeedDelivered * DriveConstants.kMaxSpeedMetersPerSecond * changing_vars.speed_multi_change, rotDelivered * DriveConstants.kMaxSpeedMetersPerSecond * changing_vars.speed_multi_change);
   }
 
   public PathPlannerPath getPathTo(Pose2d pose_initial, Pose2d pose_final, Pose2d pose_middle){
@@ -535,7 +547,9 @@ public Thread zeroHeadingThread(){
   Thread zThread = new Thread(() -> {
     try {
       Thread.sleep(1000);
-      startHeading();
+      zeroHeading();
+      //startHeading();
+      //m_odometry.resetPose(new Pose2d(7.157, 7.157, new Rotation2d(135)));
     }catch (Exception e) {
     }
   });

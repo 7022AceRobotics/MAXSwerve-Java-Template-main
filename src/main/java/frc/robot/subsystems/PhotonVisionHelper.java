@@ -43,13 +43,17 @@ public class PhotonVisionHelper extends SubsystemBase {
     camera.setPipelineIndex(2);
     var result = camera.getAllUnreadResults();
     if (!result.isEmpty()){
+      //System.out.println("before result get size");
       var result2 = result.get(result.size() - 1);
       if (result2.hasTargets()){
+        //System.out.println("before getbest targ");
         PhotonTrackedTarget target = result2.getBestTarget();
+        //System.out.println("before best csm");
         Transform3d april_tag_pos = target.getBestCameraToTarget();
+ //System.out.println("before heading");
+        m_photon_pose_estimator.addHeadingData(result2.getTimestampSeconds(), m_drive_subsystem.getHeading());
 
-        m_photon_pose_estimator.addHeadingData(DriverStation.getMatchTime(), m_drive_subsystem.getHeading());
-
+        System.out.println("after heading");
         estimated_pose = m_photon_pose_estimator.update(result2);
 
 

@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -20,6 +21,9 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -38,6 +42,8 @@ public class PivotSubsystem extends SubsystemBase {
   private final SparkClosedLoopController m_controller;
   public final RelativeEncoder m_encoder;
   private SparkBaseConfig m_config;
+  private ArmFeedforward ff_val = new ArmFeedforward(0.01,0.09,2.92,0);
+
   @Logged(name = "TargetPosition")
   private double m_targetPosition;
   
@@ -54,11 +60,12 @@ public class PivotSubsystem extends SubsystemBase {
           .p(PivotConstants.kP)
           .i(PivotConstants.kI)
           .d(PivotConstants.kD)
-          .outputRange(PivotConstants.kMinOutput, PivotConstants.kMaxOutput)
+          .outputRange(-0.3, 0.3)
           .p(1, ClosedLoopSlot.kSlot1)
           .i(0, ClosedLoopSlot.kSlot1)
           .d(0, ClosedLoopSlot.kSlot1)
-          .velocityFF(1.4, ClosedLoopSlot.kSlot1);
+          .velocityFF(0.1, ClosedLoopSlot.kSlot1);
+
       m_config.closedLoop.maxMotion
           .maxVelocity(PivotConstants.kMaxVel)
           .maxAcceleration(PivotConstants.kMaxAccel)
@@ -79,13 +86,31 @@ public class PivotSubsystem extends SubsystemBase {
     public void goToPosition(double position){
       SmartDashboard.putNumber("BBBBBBBBBBBB", 5);
       m_targetPosition = position;
-      m_controller.setReference(position, SparkBase.ControlType.kMAXMotionPositionControl);
-    
+      m_controller.setReference(
+        position, 
+        SparkBase.ControlType.kMAXMotionPositionControl);
+        // ClosedLoopSlot.kSlot0, 
+        // ff_val.calculate(
+        //   Units.degreesToRadians(position - 90), 
+        //   Units.degreesToRadians(
+        //     degreePerRotation(
+        //       m_encoder.getVelocity()
+        //       ))));
     }
+
+    public void JoystickPivotPosition(Supplier<Double> targetSpeed){
+    m_targetPosition = Math.min(0, m_targetPosition + MathUtil.applyDeadband(targetSpeed.get(), 0.1)*0.1);
+    m_controller.setReference(m_targetPosition, ControlType.kPosition);
+  }
   
     public double rotationPerDegree(double degree){
       // Converts negative to positive becuase neo is facing opposite direction, and I don't want to use the rev hardware client/
       return -degree / 360 * PivotConstants.kGearRatio;
+    }
+
+    public double degreePerRotation(double rotations){
+      // Converts negative to positive becuase neo is facing opposite direction, and I don't want to use the rev hardware client/
+      return -rotations / PivotConstants.kGearRatio * 360;
     }
   
     public void changePIDValues(){
@@ -120,5 +145,9 @@ public class PivotSubsystem extends SubsystemBase {
   @Logged(name = "getCurrent")
   public double getCurrent() {
     return m_pivot_motor.getOutputCurrent();
+  }
+  @Logged(name = "getVel")
+  public double getVelocity() {
+    return degreePerRotation(m_encoder.getVelocity());
   }
 }

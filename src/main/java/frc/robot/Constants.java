@@ -158,7 +158,7 @@ public final class Constants {
 
     public static double kL1 = 0;
     public static double kL2 = 0.004;
-    public static double kL3 = 0.32;
+    public static double kL3 = 0.35;
     public static double kL4 = 0.6; // 0.530946
     public static double kL0 = 0;
     public static double kLI = 0;
@@ -190,20 +190,20 @@ public final class Constants {
 
   public class PivotConstants {
     public static final int PivotMotorPort = 12;
-    public static final double kP = 0.3;
+    public static final double kP = 0.1;
     public static final double kI = 0;
-    public static final double kD = 0;
+    public static final double kD = 0.01;
     public static final double kMaxOutput = 1;
     public static final double kMinOutput = -1;
     public static final double kMaxVel = 5000;
     public static final double kMaxAccel = 2500;
     public static final double kAllowedErr = 0.05;
     //Pivot Positions has to be positive
-    public static final double kL0 = 0;
-    public static final double kL1 = 0; // measured in degrees 87.04
+    public static final double kL0 = 3;
+    public static final double kL1 = 3; // measured in degrees 87.04
     public static final double kL2 = 35;
-    public static final double kL3 = 35;
-    public static final double kL4 = 39; //92.95
+    public static final double kL3 = 38;
+    public static final double kL4 = 37; //92.95
     public static final double kLI = 23;// 74 before encoder
     public static final double kM = 20;
 

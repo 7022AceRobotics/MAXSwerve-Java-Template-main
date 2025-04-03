@@ -13,6 +13,8 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import java.util.function.Supplier;
+
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
@@ -20,6 +22,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -32,6 +35,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     private SparkClosedLoopController elevator_pidController;
     public RelativeEncoder elevator_encoder;
     private SparkBaseConfig config;
+    private double m_targetPosition2;
   /** Creates a new ElevatorSubsystem. */
   public ElevatorSubsystem() {
     SmartDashboard.putNumber("ELE POS", 0);
@@ -93,6 +97,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
   public void SetElevatorPosition(double targetposition) {
     m_targetPosition = targetposition;
+    //m_targetPosition2 = targetposition;
     elevator_pidController.setReference(targetposition, ControlType.kPosition); 
     if (targetposition == 0.32){
       changing_vars.speed_multi_change = 0.5;
@@ -103,6 +108,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     // elevator_pidController.setReference(targetposition, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, 0.1, ArbFFUnits.kPercentOut);
     // elevator_pidController.setReference(0.05, ControlType.kDutyCycle);
     //SmartDashboard.putNumber("AAAAAAAAAAAAAAA", 5); 
+  }
+
+  public void JoystickElevatorPosition(Supplier<Double> targetSpeed){
+    // SmartDashboard.putNumber("JOYSTICK", - targetSpeed.get());
+    // m_targetPosition2 = Math.min(0, m_targetPosition2 - MathUtil.applyDeadband(targetSpeed.get(), 0.1)*0.1);
+    // elevator_pidController.setReference(m_targetPosition2, ControlType.kPosition);
   }
   
   public void resetElevatorPID(){

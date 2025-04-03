@@ -137,6 +137,11 @@ public class RobotContainer {
     m_shooter_subsystem.setDefaultCommand(new suck(m_shooter_subsystem, ()->m_operator_controller.getRawAxis(2), ()->m_operator_controller.getRawAxis(3), "Teleop"));
 
     m_led_subsystem.setDefaultCommand(new RunCommand(() -> m_led_subsystem.setBennies(), m_led_subsystem));
+
+    // m_elevator_subsystem.setDefaultCommand(new RunCommand(()->m_elevator_subsystem.JoystickElevatorPosition(() -> m_operator_controller.getLeftY()), m_elevator_subsystem));
+
+    // m_pivot_subsystem.setDefaultCommand(new RunCommand(()->m_pivot_subsystem.JoystickPivotPosition(() -> m_operator_controller.getRightY()), m_pivot_subsystem));
+
     //m_shooter_subsystem.setDefaultCommand(new suck(m_shooter_subsystem));
 
     autoChooser = AutoBuilder.buildAutoChooser();
@@ -196,9 +201,9 @@ public class RobotContainer {
     new JoystickButton(m_operator_controller, 1).whileTrue(
       new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 2)
      ); // Level 2 Back
-    new JoystickButton(m_operator_controller, 2).whileTrue(
-      new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 3)
-    ); // Level 3 Y
+    // new JoystickButton(m_operator_controller, 2).whileTrue(
+    //   new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 3)
+    // ); // Level 3 Y
     new JoystickButton(m_operator_controller, 4).whileTrue(
       new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 4)
     ); // Level 4 LB
@@ -227,6 +232,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("shoot", new suck(m_shooter_subsystem, ()->m_driverController.getRawAxis(2), ()->m_operator_controller.getRawAxis(2), "Auto").withTimeout(1.5));
     NamedCommands.registerCommand("L0", new score2(m_elevator_subsystem, m_pivot_subsystem,m_shooter_subsystem, 0));
     NamedCommands.registerCommand("Pivot4",new pivotTo(m_pivot_subsystem, PivotConstants.kL4));
+    NamedCommands.registerCommand("limelight",new limelight(m_limelight_subsystem2, m_robotDrive));
+
 
 
     new EventTrigger("shootE").whileTrue(new suck(m_shooter_subsystem, ()->m_driverController.getRawAxis(2), ()->m_operator_controller.getRawAxis(2), "Auto"));
@@ -276,11 +283,11 @@ public class RobotContainer {
         m_robotDrive);
 
     // Reset odometry to the starting pose of the trajectory.
-    m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+    //m_robotDrive.resetOdometry(new Pose2d(7.157, 1.106, new Rotation2d(154.941)));
 
     //return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, DriverStation.getAlliance()));
 
     // Run path following command, then stop at the end.
-    return new PathPlannerAuto("Auto2");
+    return new PathPlannerAuto("TestTest");
   }
 }
