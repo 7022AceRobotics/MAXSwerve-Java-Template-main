@@ -2,6 +2,8 @@
   <h1>2025 ACE Robotics MAXSwerve</h1>
   <p><em>The code deployed for the FRC 2025 ACE robotics robot</em></p>
 
+  <p>Video Demo: https://drive.google.com/file/d/1j12dUKFMWXP-soU3a0mHOBXh2VbRaRvS/view?usp=sharing</p>
+
   <img alt="last-commit" src="https://img.shields.io/github/last-commit/7022AceRobotics/MAXSwerve-Java-Template-main?style=flat&logo=git&logoColor=white&color=0080ff">
   <img alt="repo-top-language" src="https://img.shields.io/github/languages/top/7022AceRobotics/MAXSwerve-Java-Template-main?style=flat&color=0080ff">
   <img alt="repo-language-count" src="https://img.shields.io/github/languages/count/7022AceRobotics/MAXSwerve-Java-Template-main?style=flat&color=0080ff">
